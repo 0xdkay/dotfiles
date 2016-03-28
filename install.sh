@@ -145,7 +145,12 @@ case "$1" in
     do
       replace_file "$FILENAME"
     done
+
+    # install gdb
     replace_file 'Gdbinit/gdbinit' '.gdbinit'
+    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
+    echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
+
     replace_file 'tpm' '.tmux/plugins/tpm'
     echo 'Done.'
     ;;

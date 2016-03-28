@@ -147,7 +147,7 @@ case "$1" in
     done
 
     # install gdb
-    replace_file 'Gdbinit/gdbinit' '.gdbinit'
+    #replace_file 'Gdbinit/gdbinit' '.gdbinit'
     git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
     echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
 

@@ -2,10 +2,6 @@
 DIRNAME="$(dirname "$0")"
 DIR="$(cd "$DIRNAME" && pwd)"
 
-function setup() {
-}
-
-
 function echoerr() {
   echo "$@" 1>&2
 }

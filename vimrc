@@ -23,6 +23,8 @@ if has('python')
 
   let s:python26 = s:VersionRequirement(
         \ map(split(split(s:pyv)[0], '\.'), 'str2nr(v:val)'), [2, 6])
+else
+  let s:python26 = 0
 endif
 
 " =============================================================================
@@ -88,23 +90,23 @@ if executable('editorconfig') == 1 || has('python3') || s:python26
 endif
 if !has('win32')
   if v:version >= 704 || v:version == 703 && has('patch598') &&
-        \ (has('python3') || s:python26)
+        \ executable('cmake') && (has('python3') || s:python26)
     function! BuildYCM(info)
       " info is a dictionary with 3 fields
       " - name: name of the plugin
       " - status: 'installed', 'updated', or 'unchanged'
       " - force: set on PlugInstall! or PlugUpdate!
       if a:info.status == 'installed' || a:info.force
-        let options = ['--clang-completer']
-        if executable('go')
-          let options += ['--gocode-completer']
-        endif
-        if executable('npm')
-          let options += ['--tern-completer']
-        endif
-        if executable('cargo')
-          let options += ['--racer-completer']
-        endif
+        let options = []
+        let requirements = [['clang', '--clang-completer'],
+              \ ['go', '--gocode-completer'],
+              \ ['npm', '--tern-completer'],
+              \ ['cargo', '--racer-completer']]
+        for r in requirements
+          if executable(r[0])
+            let options += [r[1]]
+          endif
+        endfor
         execute '!./install.py ' . join(options, ' ')
       endif
     endfunction
@@ -132,8 +134,10 @@ Plug 'tpope/vim-eunuch'
 " Syntax checking plugin
 Plug 'scrooloose/syntastic'
 " Automated tag file generation and syntax highlighting of tags
-Plug 'xolox/vim-misc' |
-Plug 'xolox/vim-easytags'
+if executable('ctags')
+  Plug 'xolox/vim-misc' |
+  Plug 'xolox/vim-easytags'
+endif
 " Vim Git runtime files
 Plug 'tpope/vim-git'
 " Git wrapper

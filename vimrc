@@ -27,6 +27,14 @@ else
   let s:python26 = 0
 endif
 
+if !empty(&rtp)
+  let s:vimfiles = split(&rtp, ',')[0]
+else
+  echohl ErrorMsg
+  echomsg 'Unable to determine runtime path for Vim.'
+  echohl NONE
+endif
+
 " =============================================================================
 " Vim Plug: {{{
 " =============================================================================
@@ -36,15 +44,10 @@ filetype off
 
 " Install vim-plug if it isn't installed and call plug#begin() out of box
 function! s:DownloadVimPlug()
-  if !empty(&rtp)
-    let vimfiles = split(&rtp, ',')[0]
-  else
-    echohl ErrorMsg
-    echomsg 'Unable to determine runtime path for Vim.'
-    echohl NONE
+  if !exists('s:vimfiles')
     return
   endif
-  if empty(glob(vimfiles . '/autoload/plug.vim'))
+  if empty(glob(s:vimfiles . '/autoload/plug.vim'))
     let plug_url = 'https://github.com/junegunn/vim-plug.git'
     let tmp = tempname()
     let new = tmp . '/plug.vim'
@@ -58,10 +61,10 @@ function! s:DownloadVimPlug()
         return
       endif
 
-      if !isdirectory(vimfiles . '/autoload')
-        call mkdir(vimfiles . '/autoload', 'p')
+      if !isdirectory(s:vimfiles . '/autoload')
+        call mkdir(s:vimfiles . '/autoload', 'p')
       endif
-      call rename(new, vimfiles . '/autoload/plug.vim')
+      call rename(new, s:vimfiles . '/autoload/plug.vim')
 
       " Install plugins at first
       autocmd VimEnter * PlugInstall | quit
@@ -72,7 +75,7 @@ function! s:DownloadVimPlug()
       endif
     endtry
   endif
-  call plug#begin(vimfiles . '/plugged')
+  call plug#begin(s:vimfiles . '/plugged')
 endfunction
 
 call s:DownloadVimPlug()
@@ -89,9 +92,9 @@ if executable('editorconfig') == 1 || has('python3') || s:python26
   Plug 'editorconfig/editorconfig-vim'
 endif
 if !has('win32')
-  if v:version >= 704 || v:version == 703 && has('patch598') &&
+  if (v:version >= 704 || v:version == 703 && has('patch598')) &&
         \ executable('cmake') && (has('python3') || s:python26)
-    function! BuildYCM(info)
+    function! s:BuildYCM(info)
       " info is a dictionary with 3 fields
       " - name: name of the plugin
       " - status: 'installed', 'updated', or 'unchanged'
@@ -112,7 +115,9 @@ if !has('win32')
     endfunction
 
     " A code-completion engine for Vim
-    Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+    let BuildYCMRef = function('s:BuildYCM')
+    Plug 'Valloric/YouCompleteMe', { 'do': BuildYCMRef }
+    unlet BuildYCMRef
     " Generates config files for YouCompleteMe
     Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
   endif
@@ -218,6 +223,8 @@ Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'elzr/vim-json', { 'for': ['json', 'markdown'] }
 " JSX, requires pangloss/vim-javascript
 Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
+" LaTeX
+Plug 'lervag/vimtex', { 'for': 'tex' }
 " Markdown
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -557,7 +564,7 @@ autocmd vimrc FileType *
       \   formatoptions+=q
       \   formatoptions+=l
       \   formatoptions-=o |
-      \ if &filetype !=# 'gitcommit' && &filetype !=# 'markdown' |
+      \ if index(['gitcommit', 'markdown', 'tex'], &filetype) < 0 |
       \   setlocal formatoptions-=t |
       \ endif |
       \ if v:version >= 704 || v:version == 703 && has('patch541') |
@@ -796,6 +803,22 @@ if executable('editorconfig')
 endif
 
 " YouCompleteMe
+let g:ycm_filetype_blacklist = {
+      \ 'infolog': 1,
+      \ 'mail': 1,
+      \ 'markdown': 1,
+      \ 'netrw': 1,
+      \ 'notes': 1,
+      \ 'pandoc': 1,
+      \ 'qf': 1,
+      \ 'tagbar': 1,
+      \ 'text': 1,
+      \ 'unite': 1,
+      \ 'vimwiki': 1 }
+if exists('s:vimfiles')
+  let g:ycm_global_ycm_extra_conf = s:vimfiles .
+        \ '/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+endif
 let g:ycm_confirm_extra_conf = 0
 
 " Syntastic

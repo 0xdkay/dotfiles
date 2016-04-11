@@ -727,7 +727,8 @@ function! s:CheckLeftBuffers()
     let i = 1
     while i <= winnr('$')
       let l:filetypes = ['help', 'quickfix', 'nerdtree', 'taglist']
-      if index(l:filetypes, getbufvar(winbufnr(i), '&filetype')) >= 0
+      if index(l:filetypes, getbufvar(winbufnr(i), '&filetype')) >= 0 ||
+            \ getwinvar(i, '&previewwindow')
         let i += 1
       else
         break
@@ -804,6 +805,7 @@ endif
 
 " YouCompleteMe
 let g:ycm_filetype_blacklist = {
+      \ 'diff': 1,
       \ 'infolog': 1,
       \ 'mail': 1,
       \ 'markdown': 1,
@@ -815,6 +817,8 @@ let g:ycm_filetype_blacklist = {
       \ 'text': 1,
       \ 'unite': 1,
       \ 'vimwiki': 1 }
+let g:ycm_enable_diagnostic_highlighting = 0
+let g:ycm_autoclose_preview_window_after_insertion = 1
 if exists('s:vimfiles')
   let g:ycm_global_ycm_extra_conf = s:vimfiles .
         \ '/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
@@ -828,6 +832,8 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_aggregate_errors = 1
 " Sort errors by file, line number, type, column number
 let g:syntastic_sort_aggregated_errors = 1
+" Turn off highlighting for marking errors
+let g:syntastic_enable_highlighting = 0
 " Always stick any detected errors into the location-list
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_mode_map = { 'mode': 'passive' }

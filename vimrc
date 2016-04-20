@@ -103,7 +103,6 @@ if !has('win32')
         let options = []
         let requirements = [['clang', '--clang-completer'],
               \ ['go', '--gocode-completer'],
-              \ ['npm', '--tern-completer'],
               \ ['cargo', '--racer-completer']]
         for r in requirements
           if executable(r[0])
@@ -663,14 +662,15 @@ function! s:ZoomToggle()
   if exists('t:zoomed') && t:zoomed
     execute t:zoom_winrestcmd
     let t:zoomed = 0
-  else
+  elseif tabpagewinnr(tabpagenr('$'), '$') > 1
+    " Resize only when multiple windows are in the current tab page
     let t:zoom_winrestcmd = winrestcmd()
     resize
     vertical resize
     let t:zoomed = 1
   endif
 endfunction
-nnoremap <Leader>z :call <SID>ZoomToggle()<CR>
+nnoremap <silent> <Leader>z :call <SID>ZoomToggle()<CR>
 
 augroup vimrc
   " Quit help window

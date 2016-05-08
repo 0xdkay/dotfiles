@@ -250,3 +250,5 @@ alias ruby-server='ruby -run -ehttpd . -p8000'
 if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
+
+LIME_SHOW_HOSTNAME=1

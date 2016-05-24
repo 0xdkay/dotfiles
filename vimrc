@@ -258,6 +258,8 @@ Plug 'tpope/vim-rails'
 Plug 'AnsiEsc.vim', { 'for': 'railslog' }
 " TomDoc
 Plug 'wellbredgrapefruit/tomdoc.vim', { 'for': 'ruby' }
+" LanguageTool
+Plug 'vim-scripts/LanguageTool'
 
 " Mac OS
 if has('mac') || has('macunix')

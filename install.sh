@@ -57,13 +57,13 @@ function replace_file() {
 
 case "$1" in
   update)
-    # dotfiles update
-    git pull upstream master
-    git pull origin master
-
     # update package list
     sudo apt-get update
     sudo apt-get -y dist-upgrade
+
+    # dotfiles update
+    git pull upstream master
+    git pull origin master
 
     # vim update
     vim +PlugUpgrade
@@ -73,6 +73,8 @@ case "$1" in
     cd ~/.gdb/pwndbg/
     git pull origin master
     ./setup.sh
+
+    sudo apt-get autoremove -y
     ;;
 
   base)

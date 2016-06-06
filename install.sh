@@ -68,10 +68,17 @@ case "$1" in
 
     # install softwares
     sudo apt-get install -y vim exuberant-ctags zsh
-    sudo apt-get install -y tmux gdb
+    sudo apt-get install -y tmux
     sudo apt-get install build-essential python-dev python-pip
-
     ;;
+
+  gdb)
+    # install gdb
+    sudo apt-get install -y gdb
+    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
+    echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
+    ;;
+
   apache)
     # install apache, mysql, php
     sudo apt-get install -y apache2
@@ -146,11 +153,6 @@ case "$1" in
       replace_file "$FILENAME"
     done
 
-    # install gdb
-    #replace_file 'Gdbinit/gdbinit' '.gdbinit'
-    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-    echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
-
     replace_file 'tpm' '.tmux/plugins/tpm'
     echo 'Done.'
     ;;
@@ -211,7 +213,9 @@ case "$1" in
     echo "usage: $(basename "$0") <command>"
     echo ''
     echo 'Available commands:'
+    ec
     echo '    base      Install basic packages'
+    echo '    gdb       Install pwndbg'
     echo '    apache    Install apache, mysql, php5'
     echo '    ftp       Install vsftpd with self-signed certificate'
     echo '    github    Install github account'

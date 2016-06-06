@@ -222,12 +222,6 @@ case "$1" in
     \curl -sSL https://get.rvm.io | bash -s stable
     ;;
 
-  zplug)
-    git_clone https://github.com/b4b4r07/zplug.git .zplug/repos/b4b4r07/zplug
-    ln -s "$HOME/.zplug/repos/b4b4r07/zplug/zplug" "$HOME/.zplug/zplug"
-    echo 'Done.'
-    ;;
-
   *)
     echo "usage: $(basename "$0") <command>"
     echo ''
@@ -245,6 +239,5 @@ case "$1" in
     echo '    pyenv     Install pyenv with pyenv-virtualenv'
     echo '    rbenv     Install rbenv'
     echo '    rvm       Install RVM'
-    echo '    zplug     Install zplug'
     ;;
 esac

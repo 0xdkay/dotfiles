@@ -160,7 +160,9 @@ fi
 
 # Load autojump
 if command -v autojump &> /dev/null; then
-  if [ -f /etc/profile.d/autojump.bash ]; then
+  if [ -f "$HOME/.autojump/etc/profile.d/autojump.sh" ]; then
+    source "$HOME/.autojump/etc/profile.d/autojump.sh"
+  elif [ -f /etc/profile.d/autojump.bash ]; then
     source /etc/profile.d/autojump.bash
   elif [ -f /usr/share/autojump/autojump.bash ]; then
     source /usr/share/autojump/autojump.bash
@@ -267,6 +269,11 @@ alias la='ls -lAh'
 alias l='ls -lah'
 alias md='mkdir -p'
 alias rd='rmdir'
+alias cd..='cd ..'
+alias cd...='cd ../..'
+alias cd....='cd ../../..'
+alias cd.....='cd ../../../..'
+alias cd......='cd ../../../../..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'

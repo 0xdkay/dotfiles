@@ -70,8 +70,9 @@ case "$1" in
     vim +PlugUpdate
 
     # pwngdb update
-    cd ~/gdb/pwndbg/
+    cd ~/.gdb/pwndbg/
     git pull origin master
+    ./setup.sh
     ;;
 
   base)

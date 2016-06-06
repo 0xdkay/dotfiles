@@ -56,6 +56,24 @@ function replace_file() {
 }
 
 case "$1" in
+  update)
+    # dotfiles update
+    git pull upstream master
+    git pull origin master
+
+    # update package list
+    sudo apt-get update
+    sudo apt-get -y dist-upgrade
+
+    # vim update
+    vim +PlugUpgrade
+    vim +PlugUpdate
+
+    # pwngdb update
+    cd ~/gdb/pwndbg/
+    git pull origin master
+    ;;
+
   base)
     # change archive from us to kr
     sudo sed -i 's/us.archive/kr.archive/g' /etc/apt/sources.list
@@ -76,7 +94,8 @@ case "$1" in
     # install gdb
     sudo apt-get install -y gdb
     git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-    echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
+    cd ~/.gdb/pwndbg
+    ./setup.sh
     ;;
 
   apache)
@@ -213,7 +232,7 @@ case "$1" in
     echo "usage: $(basename "$0") <command>"
     echo ''
     echo 'Available commands:'
-    ec
+    echo '    update    Update installed packages'
     echo '    base      Install basic packages'
     echo '    gdb       Install pwndbg'
     echo '    apache    Install apache, mysql, php5'

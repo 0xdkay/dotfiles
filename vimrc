@@ -35,6 +35,7 @@ else
   echohl NONE
 endif
 
+" }}}
 " =============================================================================
 " Vim Plug: {{{
 " =============================================================================
@@ -92,7 +93,8 @@ if executable('editorconfig') == 1 || has('python3') || s:python26
   Plug 'editorconfig/editorconfig-vim'
 endif
 if !has('win32')
-  if (v:version >= 704 || v:version == 703 && has('patch598')) &&
+  if !has('win32unix') &&
+        \ (v:version >= 704 || v:version == 703 && has('patch598')) &&
         \ executable('cmake') && (has('python3') || s:python26)
     function! s:BuildYCM(info)
       " info is a dictionary with 3 fields
@@ -1107,6 +1109,10 @@ command! LightLineSyntasticToggleMode call s:LightLineSyntasticToggleMode()
 
 " rainbow_parentheses.vim
 autocmd vimrc FileType clojure,lisp,racket,scheme RainbowParentheses
+
+" vim-startify
+" let g:startify_custom_header = startify#fortune#cowsay()
+let g:startify_custom_header = 'map(startify#fortune#boxed(), "\"   \".v:val")'
 
 " goyo.vim
 nnoremap <Leader>G :Goyo<CR>

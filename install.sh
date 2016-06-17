@@ -56,6 +56,27 @@ function replace_file() {
 }
 
 case "$1" in
+  update)
+    # update package list
+    sudo apt-get update
+    sudo apt-get -y dist-upgrade
+
+    # dotfiles update
+    git pull upstream master
+    git pull origin master
+
+    # vim update
+    vim +PlugUpgrade
+    vim +PlugUpdate
+
+    # pwngdb update
+    cd ~/.gdb/pwndbg/
+    git pull origin master
+    ./setup.sh
+
+    sudo apt-get autoremove -y
+    ;;
+
   base)
     # change archive from us to kr
     sudo sed -i 's/us.archive/kr.archive/g' /etc/apt/sources.list
@@ -68,10 +89,18 @@ case "$1" in
 
     # install softwares
     sudo apt-get install -y vim exuberant-ctags zsh
-    sudo apt-get install -y tmux gdb
+    sudo apt-get install -y tmux
     sudo apt-get install build-essential python-dev python-pip
-
     ;;
+
+  gdb)
+    # install gdb
+    sudo apt-get install -y gdb
+    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
+    cd ~/.gdb/pwndbg
+    ./setup.sh
+    ;;
+
   apache)
     # install apache, mysql, php
     sudo apt-get install -y apache2
@@ -146,11 +175,6 @@ case "$1" in
       replace_file "$FILENAME"
     done
 
-    # install gdb
-    #replace_file 'Gdbinit/gdbinit' '.gdbinit'
-    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-    echo "source ~/.gdb/pwndbg/gdbinit.py" >> ~/.gdbinit
-
     replace_file 'tpm' '.tmux/plugins/tpm'
     echo 'Done.'
     ;;
@@ -201,17 +225,13 @@ case "$1" in
     \curl -sSL https://get.rvm.io | bash -s stable
     ;;
 
-  zplug)
-    git_clone https://github.com/b4b4r07/zplug.git .zplug/repos/b4b4r07/zplug
-    ln -s "$HOME/.zplug/repos/b4b4r07/zplug/zplug" "$HOME/.zplug/zplug"
-    echo 'Done.'
-    ;;
-
   *)
     echo "usage: $(basename "$0") <command>"
     echo ''
     echo 'Available commands:'
+    echo '    update    Update installed packages'
     echo '    base      Install basic packages'
+    echo '    gdb       Install pwndbg'
     echo '    apache    Install apache, mysql, php5'
     echo '    ftp       Install vsftpd with self-signed certificate'
     echo '    github    Install github account'
@@ -222,6 +242,5 @@ case "$1" in
     echo '    pyenv     Install pyenv with pyenv-virtualenv'
     echo '    rbenv     Install rbenv'
     echo '    rvm       Install RVM'
-    echo '    zplug     Install zplug'
     ;;
 esac

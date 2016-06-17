@@ -46,11 +46,17 @@ if [[ -d "$HOME/.linuxbrew" ]]; then
   export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
 fi
 
+# Check if zplug is installed
+if [[ ! -d "$HOME/.zplug" ]]; then
+  git clone https://github.com/zplug/zplug "$HOME/.zplug/repos/zplug/zplug"
+  ln -s "$HOME/.zplug/repos/zplug/zplug/init.zsh" "$HOME/.zplug/init.zsh"
+fi
+
 # Load zplug
-source $HOME/.zplug/zplug
+source $HOME/.zplug/init.zsh
 
 # Let zplug manage zplug
-zplug "b4b4r07/zplug"
+zplug "zplug/zplug"
 # Vanilla shell
 zplug "yous/vanilli.sh"
 # Additional completion definitions for Zsh
@@ -86,7 +92,9 @@ fi
 
 # Load autojump
 if command -v autojump &> /dev/null; then
-  if [ -f /etc/profile.d/autojump.zsh ]; then
+  if [ -f "$HOME/.autojump/etc/profile.d/autojump.sh" ]; then
+    source "$HOME/.autojump/etc/profile.d/autojump.sh"
+  elif [ -f /etc/profile.d/autojump.zsh ]; then
     source /etc/profile.d/autojump.zsh
   elif [ -f /usr/share/autojump/autojump.zsh ]; then
     source /usr/share/autojump/autojump.zsh
@@ -194,6 +202,11 @@ alias la='ls -lAh'
 alias l='ls -lah'
 alias md='mkdir -p'
 alias rd='rmdir'
+alias cd..='cd ..'
+alias cd...='cd ../..'
+alias cd....='cd ../../..'
+alias cd.....='cd ../../../..'
+alias cd......='cd ../../../../..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'

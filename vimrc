@@ -1154,3 +1154,5 @@ endif
 
 " }}}
 " =============================================================================
+
+let g:languagetool_jar = '/home/dongkwan/tools/LanguageTool-3.3/languagetool-commandline.jar'

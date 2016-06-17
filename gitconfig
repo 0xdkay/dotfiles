@@ -1,13 +1,14 @@
 [core]
-	attributesfile = ~/.gitattributes_global
-	excludesfile = ~/.gitignore_global
+	attributesFile = ~/.gitattributes_global
+	excludesFile = ~/.gitignore_global
 	editor = vim
 	pager = less -F -R -X
-	precomposeunicode = true
-	quotepath = false
+	precomposeUnicode = true
+	quotePath = false
 [color]
 	ui = auto
 [diff]
+	compactionHeuristic = true
 	renames = true
 [diff "nodiff"]
 	command = true
@@ -23,10 +24,18 @@
 	smudge = git-lfs smudge %f
 [include]
 	path = ~/.gitconfig.local
+[interactive]
+	diffFilter = diff-highlight
 [log]
 	date = iso8601
+[pager]
+	diff = diff-highlight | $(git config core.pager)
+	log = diff-highlight | $(git config core.pager)
+	show = diff-highlight | $(git config core.pager)
 [push]
 	default = simple
 [user]
 	email = 0xdkay@gmail.com
 	name = Dongkwan Kim
+[submodule]
+	fetchJobs = 0

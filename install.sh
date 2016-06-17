@@ -176,6 +176,10 @@ case "$1" in
     done
 
     replace_file 'tpm' '.tmux/plugins/tpm'
+    for FILENAME in bin/*
+    do
+      replace_file "$FILENAME" "$FILENAME"
+    done
     echo 'Done.'
     ;;
 

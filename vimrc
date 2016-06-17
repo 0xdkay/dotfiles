@@ -555,6 +555,8 @@ set tabstop=8
 set textwidth=80
 autocmd vimrc FileType c,cpp,java,markdown,python
       \ setlocal softtabstop=4 shiftwidth=4
+autocmd vimrc FileType gitconfig
+      \ setlocal noexpandtab softtabstop=8 shiftwidth=8
 autocmd vimrc FileType go
       \ setlocal noexpandtab softtabstop=4 shiftwidth=4 tabstop=4
 " t: Auto-wrap text using textwidth
@@ -764,6 +766,8 @@ augroup vimrc
 
   " Keyword lookup program
   autocmd FileType c,cpp setlocal keywordprg=man
+  autocmd FileType gitconfig
+        \ setlocal keywordprg=man\ git-config\ \|\ less\ -i\ -p
   autocmd FileType help,vim setlocal keywordprg=:help
   autocmd FileType ruby setlocal keywordprg=ri
 
@@ -857,6 +861,7 @@ let g:syntastic_javascript_jslint_args = '--white --nomen --regexp --plusplus
 
 " vim-shell
 let g:shell_hl_exclude = '^.*$'
+let g:shell_mappings_enabled = 0
 
 " vim-easytags
 let g:easytags_auto_highlight = 0
@@ -1122,6 +1127,9 @@ let g:adblock_filter_auto_checksum = 1
 
 " vim-json
 let g:vim_json_syntax_conceal = 0
+
+" vimtex
+let g:vimtex_view_enabled = 0
 
 " vim-markdown
 let g:vim_markdown_no_default_key_mappings = 1

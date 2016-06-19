@@ -34,8 +34,8 @@
 	show = diff-highlight | $(git config core.pager)
 [push]
 	default = simple
+[submodule]
+	fetchJobs = 0
 [user]
 	email = 0xdkay@gmail.com
 	name = Dongkwan Kim
-[submodule]
-	fetchJobs = 0

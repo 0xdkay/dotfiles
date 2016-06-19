@@ -62,7 +62,6 @@ case "$1" in
     sudo apt-get -y dist-upgrade
 
     # dotfiles update
-    git pull upstream master
     git pull origin master
 
     # vim update

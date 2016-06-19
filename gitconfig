@@ -39,3 +39,4 @@
 [user]
 	email = 0xdkay@gmail.com
 	name = Dongkwan Kim
+	useConfigOnly = true

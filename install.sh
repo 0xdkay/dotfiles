@@ -57,9 +57,14 @@ function replace_file() {
 
 case "$1" in
   update)
-    # update package list
-    sudo apt-get update
-    sudo apt-get -y dist-upgrade
+    if [ ! -e "$HOME/.DS_Store" ]; then
+      # update package list
+      sudo apt-get update
+      sudo apt-get -y dist-upgrade
+    else
+      brew update
+      brew upgrade
+    fi
 
     # dotfiles update
     git pull origin master
@@ -68,12 +73,14 @@ case "$1" in
     vim +PlugUpgrade
     vim +PlugUpdate
 
-    # pwngdb update
-    cd ~/.gdb/pwndbg/
-    git pull origin master
-    ./setup.sh
+    if [ ! -e "$HOME/.DS_Store" ]; then
+      # pwngdb update
+      cd ~/.gdb/pwndbg/
+      git pull origin master
+      ./setup.sh
 
-    sudo apt-get autoremove -y
+      sudo apt-get autoremove -y
+    fi
     ;;
 
   base)

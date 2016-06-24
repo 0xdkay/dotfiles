@@ -57,7 +57,8 @@ function replace_file() {
 
 case "$1" in
   update)
-    if [ ! -e "$HOME/.DS_Store" ]; then
+
+    if [[ "$(uname)" != 'Darwin' ]]; then
       # update package list
       sudo apt-get update
       sudo apt-get -y dist-upgrade
@@ -70,10 +71,9 @@ case "$1" in
     git pull origin master
 
     # vim update
-    vim +PlugUpgrade
-    vim +PlugUpdate
+    vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
 
-    if [ ! -e "$HOME/.DS_Store" ]; then
+    if [[ "$(uname)" != 'Darwin' ]]; then
       # pwngdb update
       cd ~/.gdb/pwndbg/
       git pull origin master
@@ -100,11 +100,15 @@ case "$1" in
     ;;
 
   gdb)
-    # install gdb
-    sudo apt-get install -y gdb
-    git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-    cd ~/.gdb/pwndbg
-    ./setup.sh
+    if [[ "$(uname)" != 'Darwin' ]]; then
+      # install gdb
+      sudo apt-get install -y gdb
+      git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
+      cd ~/.gdb/pwndbg
+      ./setup.sh
+    else
+      echo "does not need pwndbg for Mac"
+    fi
     ;;
 
   apache)

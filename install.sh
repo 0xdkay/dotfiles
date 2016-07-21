@@ -73,7 +73,7 @@ case "$1" in
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
 
-    if [[ "$(uname)" != 'Darwin' ]]; then
+    if [ "$(uname)" != "Darwin" ] && [ -e "$HOME/.gdb/pwndbg" ]; then
       # pwngdb update
       cd ~/.gdb/pwndbg/
       git pull origin master
@@ -101,11 +101,16 @@ case "$1" in
 
   gdb)
     if [[ "$(uname)" != 'Darwin' ]]; then
+      if [[ ! -e "$HOME/.gdb/pwndbg" ]]; then
       # install gdb
       sudo apt-get install -y gdb
       git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
       cd ~/.gdb/pwndbg
       ./setup.sh
+
+      else
+        echo "already exists"
+      fi
     else
       echo "does not need pwndbg for Mac"
     fi

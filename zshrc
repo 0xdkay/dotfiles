@@ -46,44 +46,42 @@ if [[ -d "$HOME/.linuxbrew" ]]; then
   export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
 fi
 
-# Check if zplug is installed
-if [[ ! -d "$HOME/.zplug" ]]; then
-  git clone https://github.com/zplug/zplug "$HOME/.zplug/repos/zplug/zplug"
-  ln -s "$HOME/.zplug/repos/zplug/zplug/init.zsh" "$HOME/.zplug/init.zsh"
+# Use Antibody
+if [[ "$(uname)" == 'Linux' ]] || [[ "$(uname)" == 'Darwin' ]]; then
+  # Check if Antibody is installed
+  if [[ "$(uname)" == 'Linux' ]] && ! command -v antibody &> /dev/null; then
+    curl -s https://raw.githubusercontent.com/getantibody/installer/master/install | bash -s
+  fi
+
+  # Load Antibody
+  source <(antibody init)
+
+  antibody bundle <<EOF
+  # Vanilla shell
+  yous/vanilli.sh
+  # Additional completion definitions for Zsh
+  zsh-users/zsh-completions
+  # Load the theme.
+  yous/lime
+EOF
+  # Syntax highlighting bundle. zsh-syntax-highlighting must be loaded after
+  # excuting compinit command and sourcing other plugins.
+  antibody bundle zsh-users/zsh-syntax-highlighting
+  # ZSH port of Fish shell's history search feature
+  antibody bundle zsh-users/zsh-history-substring-search
+
+  # zsh-users/zsh-completions
+  autoload -U compinit && compinit
+
+  # zsh-users/zsh-history-substring-search
+  zmodload zsh/terminfo
+  [ -n "${terminfo[kcuu1]}" ] && bindkey "${terminfo[kcuu1]}" history-substring-search-up
+  [ -n "${terminfo[kcud1]}" ] && bindkey "${terminfo[kcud1]}" history-substring-search-down
+  bindkey -M emacs '^P' history-substring-search-up
+  bindkey -M emacs '^N' history-substring-search-down
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
 fi
-
-# Load zplug
-source $HOME/.zplug/init.zsh
-
-# Let zplug manage zplug
-zplug "zplug/zplug"
-# Vanilla shell
-zplug "yous/vanilli.sh"
-# Additional completion definitions for Zsh
-zplug "zsh-users/zsh-completions"
-# Load the theme.
-zplug "yous/lime"
-# Syntax highlighting bundle. zsh-syntax-highlighting must be loaded after
-# excuting compinit command and sourcing other plugins.
-zplug "zsh-users/zsh-syntax-highlighting", defer:3
-# ZSH port of Fish shell's history search feature
-zplug "zsh-users/zsh-history-substring-search", defer:3
-
-# Install plugins if there are plugins that have not been installed
-if ! zplug check; then
-  zplug install
-fi
-# Then, source plugins and add commands to $PATH
-zplug load
-
-# zsh-users/zsh-completions
-zmodload zsh/terminfo
-[ -n "${terminfo[kcuu1]}" ] && bindkey "${terminfo[kcuu1]}" history-substring-search-up
-[ -n "${terminfo[kcud1]}" ] && bindkey "${terminfo[kcud1]}" history-substring-search-down
-bindkey -M emacs '^P' history-substring-search-up
-bindkey -M emacs '^N' history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
 
 # Set PATH to include user's bin if it exists
 if [ -d "$HOME/bin" ]; then
@@ -183,7 +181,11 @@ fi
 
 # Enable keychain
 if command -v keychain &> /dev/null; then
-  eval `keychain --eval --quiet --agents ssh id_rsa`
+  if [ -f "$HOME/.ssh/id_rsa" ]; then
+    eval `keychain --eval --quiet --agents ssh id_rsa`
+  elif [ -f "$HOME/.ssh/id_ed25519" ]; then
+    eval `keychain --eval --quiet --agents ssh id_ed25519`
+  fi
 fi
 
 # Unset local functions
@@ -228,12 +230,14 @@ alias gc!='git commit -v --amend'
 alias gca='git commit -v -a'
 alias gca!='git commit -v -a --amend'
 alias gcb='git checkout -b'
+alias gcd='git checkout develop'
 alias gcm='git checkout master'
 alias gco='git checkout'
 alias gcp='git cherry-pick'
 alias gd='git diff'
 alias gdca='git diff --cached'
 alias gf='git fetch'
+alias gfl='git-flow'
 alias ggpush='git push origin HEAD'
 alias gl='git pull'
 alias glg='git log --graph --pretty=format:"%C(yellow)%h %C(blue)%ar %C(green)%an%C(reset) %s%C(auto)%d"'
@@ -249,7 +253,7 @@ alias grbc='git rebase --continue'
 alias grbi='git rebase -i'
 alias grup='git remote update'
 alias gst='git status'
-alias gsta='git stash'
+alias gsta='git -c commit.gpgsign=false stash'
 alias gstd='git stash drop'
 alias gstp='git stash pop'
 
@@ -257,7 +261,20 @@ alias gstp='git stash pop'
 alias v='vim'
 alias vi='vim'
 
-alias ruby-server='ruby -run -ehttpd . -p8000'
+alias ruby-server='ruby -run -ehttpd . -p8000 --bind-address=localhost'
+
+# http://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
+function man() {
+  env \
+    LESS_TERMCAP_mb=$'\e[1;31m' \
+    LESS_TERMCAP_md=$'\e[1;31m' \
+    LESS_TERMCAP_me=$'\e[0m' \
+    LESS_TERMCAP_se=$'\e[0m' \
+    LESS_TERMCAP_so=$'\e[1;44;33m' \
+    LESS_TERMCAP_ue=$'\e[0m' \
+    LESS_TERMCAP_us=$'\e[1;32m' \
+    man "$@"
+}
 
 # Source local zshrc
 if [ -f "$HOME/.zshrc.local" ]; then

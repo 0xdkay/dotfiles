@@ -3,9 +3,9 @@
 ## Tweak
 
 - [구름 입력기](http://gureum.io) ([Unofficial releases](https://github.com/soomtong/gureum/releases))
-    - [신세벌식 P](http://pat.im/1110)
+    - [신세벌식 P2](http://pat.im/1136)
 - [Workman Layout](http://www.workmanlayout.com/blog/)
-    - Remove U.S. from `AppleEnabledInputSources` in `~/Library/Preferences/com.apple.HIToolbox.plist`, and then re-login
+    - Remove U.S. from `AppleEnabledInputSources` in `~/Library/Preferences/com.apple.HIToolbox.plist`, and then reboot
 
       ``` plist
       <dict>
@@ -15,6 +15,19 @@
       	<integer>0</integer>
       	<key>KeyboardLayout Name</key>
       	<string>U.S.</string>
+      </dict>
+      ```
+
+      You may have ABC instead of U.S.
+
+      ``` plist
+      <dict>
+      	<key>InputSourceKind</key>
+      	<string>Keyboard Layout</string>
+      	<key>KeyboardLayout ID</key>
+      	<integer>252</integer>
+      	<key>KeyboardLayout Name</key>
+      	<string>ABC</string>
       </dict>
       ```
 
@@ -40,10 +53,6 @@
             - Turn off every fields
         - Passwords
             - Turn off every fields
-        - Extensions
-            - [1Password](https://agilebits.com/onepassword)
-            - [retab](https://github.com/brj/retab)
-            - [uBlock](https://www.ublock.org)
         - Advanced
             - Turn on "Show full website address"
 - Disable press-and-hold for keys in favor of key repeat:
@@ -56,6 +65,44 @@
     ``` sh
     defaults write com.apple.screencapture name -string 'Screenshot'
     ```
+- [FUSE for macOS](https://osxfuse.github.io)
+    - Install FUSE for macOS package
+    - Install NTFS-3G by running `brew install homebrew/fuse/ntfs-3g`
+    - From OS X El Capitan, reboot in [recovery mode](https://support.apple.com/en-us/HT201314)
+        - Open Utilities > Terminal
+    - Run following commands:
+
+      ``` sh
+      sudo mv /Volumes/Macintosh\ HD/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs.orig
+      sudo ln -s /Volumes/Macintosh\ HD/usr/local/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs
+      ```
+
+## Fonts
+
+- [SF Mono](https://developer.apple.com/fonts/) (`/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-*`)
+
+## Applications
+
+- [1Password](https://agilebits.com/downloads)
+- [Chrome](https://www.google.com/chrome/)
+- [Dropbox](https://www.dropbox.com/install)
+- [GPG Suite](https://gpgtools.org)
+    - Customize > Uncheck GPGMail
+- [HyperSwitch](https://bahoom.com/hyperswitch)
+    - App Switcher
+        - Check "When activating an app without windows, try to open the default window"
+- [Palua](https://itunes.apple.com/kr/app/palua/id431494195?mt=12)
+- [Safari Extensions](https://safari-extensions.apple.com)
+    - [1Password](https://safari-extensions.apple.com/details/?id=com.agilebits.onepassword4-safari-2BUA8C4S2C)
+    - [uBlock](https://www.ublock.org)
+- Quick Look
+    - [BetterZip Quick Look Generator](https://macitbetter.com/BetterZip-Quick-Look-Generator/)
+    - [Suspicious Package](http://www.mothersruin.com/software/SuspiciousPackage/)
+    - [QLColorCode](https://github.com/anthonygelibert/QLColorCode)
+    - [QLMarkdown](https://github.com/toland/qlmarkdown)
+    - [QLStephen](https://whomwah.github.io/qlstephen/)
+    - [QuickLookCSV](https://github.com/p2/quicklook-csv)
+    - [qlImageSize](https://github.com/Nyx0uf/qlImageSize)
 
 # Windows
 
@@ -63,11 +110,14 @@
 
 - [Greenshot](http://getgreenshot.org)
 - [날개셋](http://moogi.new21.org/prg4.html)
-    - [신세벌식 P](http://pat.im/1110)
+    - [신세벌식 P2](http://pat.im/1136)
 - Turn on Remote Desktop
     - Set custom RDP port number via `regedit.exe`. Navigate to
       `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp`
       and modify the value of `PortNumber`.
+    - Ignore remote keyboard layout by adding `IgnoreRemoteKeyboardLayout` under
+      `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout` with
+      data type `REG_DWORD` and the value `1`.
 - Windows Update: Download updates but let me choose whether to install them
 - Turn on Sticky Keys when SHIFT is pressed five times: Uncheck
 - Disallow the system to suggest companion windows when using Snap
@@ -114,9 +164,9 @@
 
 - [Git](http://git-scm.com)
     - [dotfiles](https://github.com/yous/dotfiles)
-- [gVim](http://www.vim.org/download.php#pc) and [Yongwei's gvim74.zip](http://wyw.dcweb.cn/#download)
+- [gVim](http://www.vim.org/download.php#pc) and [Yongwei's gvim80.zip](http://wyw.dcweb.cn/#download)
     - [Python 2.7](https://www.python.org/downloads/)
-    - [Ruby 2.0.0 (x86)](http://rubyinstaller.org/downloads/)
+    - [Ruby 2.2.5 (x86)](http://rubyinstaller.org/downloads/)
         - Add `bin` to `%PATH%`
     - [Ctags](http://ctags.sourceforge.net)
         - Put into `%USERPROFILE%\bin`
@@ -144,7 +194,7 @@
 
       ``` bat
       @echo off
-      start /b putty -load loco
+      start /b putty -load Loco
       ```
 - [Java SE](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [MSYS2](https://msys2.github.io)
@@ -158,23 +208,19 @@
         - Character set: UTF-8
         - Terminal Type: xterm-256color
     - Setup
-        - `update-core`
-        - Run MSYS2 again.
+        - `pacman -Sy pacman`
+        - Run MSYS2 again if needed.
+        - `pacman -Syu`
+        - Run MSYS2 again if needed.
         - `pacman -Su`
-        - `pacman -S zsh vim wget curl openssh grep tar unzip`
-        - `C:\msys64\msys2_shell.bat`:
-
-          ``` diff
-          -start %WD%mintty -i /msys2.ico /usr/bin/bash --login %*
-          +start %WD%mintty -i /msys2.ico /usr/bin/zsh --login %*
-          ```
+        - `pacman -S vim wget curl openssh grep tar unzip`
         - `ssh-keygen -t rsa -b 4096 -C "$(git config user.email)"`
 - [TeX Live](https://www.tug.org/texlive/acquire-netinstall.html)
 - Add `%USERPROFILE%\bin` to `%PATH%`
 
 ## Applications
 
-- [1Password](https://agilebits.com/onepassword)
+- [1Password](https://agilebits.com/downloads)
 - [Bandizip](http://www.bandisoft.co.kr/bandizip/)
 - [Chrome](https://www.google.com/chrome/)
 - [Daum PotPlayer](http://tvpot.daum.net/application/PotPlayer.do)

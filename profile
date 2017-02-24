@@ -12,4 +12,3 @@ fi
 export PATH="/home/dongkwan/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-

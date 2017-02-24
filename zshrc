@@ -65,9 +65,9 @@ zplug "zsh-users/zsh-completions"
 zplug "yous/lime"
 # Syntax highlighting bundle. zsh-syntax-highlighting must be loaded after
 # excuting compinit command and sourcing other plugins.
-zplug "zsh-users/zsh-syntax-highlighting", nice:9
+zplug "zsh-users/zsh-syntax-highlighting", defer:3
 # ZSH port of Fish shell's history search feature
-zplug "zsh-users/zsh-history-substring-search", nice:10
+zplug "zsh-users/zsh-history-substring-search", defer:3
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check; then

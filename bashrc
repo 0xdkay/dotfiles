@@ -251,7 +251,11 @@ fi
 
 # Enable keychain
 if command -v keychain &> /dev/null; then
-  eval `keychain --eval --quiet --agents ssh id_rsa`
+  if [ -f "$HOME/.ssh/id_rsa" ]; then
+    eval `keychain --eval --quiet --agents ssh id_rsa`
+  elif [ -f "$HOME/.ssh/id_ed25519" ]; then
+    eval `keychain --eval --quiet --agents ssh id_ed25519`
+  fi
 fi
 
 # Unset local functions
@@ -298,12 +302,14 @@ alias gc!='git commit -v --amend'
 alias gca='git commit -v -a'
 alias gca!='git commit -v -a --amend'
 alias gcb='git checkout -b'
+alias gcd='git checkout develop'
 alias gcm='git checkout master'
 alias gco='git checkout'
 alias gcp='git cherry-pick'
 alias gd='git diff'
 alias gdca='git diff --cached'
 alias gf='git fetch'
+alias gfl='git-flow'
 alias ggpush='git push origin HEAD'
 alias gl='git pull'
 alias glg='git log --graph --pretty=format:"%C(yellow)%h %C(blue)%ar %C(green)%an%C(reset) %s%C(auto)%d"'
@@ -319,7 +325,7 @@ alias grbc='git rebase --continue'
 alias grbi='git rebase -i'
 alias grup='git remote update'
 alias gst='git status'
-alias gsta='git stash'
+alias gsta='git -c commit.gpgsign=false stash'
 alias gstd='git stash drop'
 alias gstp='git stash pop'
 
@@ -327,7 +333,20 @@ alias gstp='git stash pop'
 alias v='vim'
 alias vi='vim'
 
-alias ruby-server='ruby -run -ehttpd . -p8000'
+alias ruby-server='ruby -run -ehttpd . -p8000 --bind-address=localhost'
+
+# http://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
+function man() {
+  env \
+    LESS_TERMCAP_mb=$'\e[1;31m' \
+    LESS_TERMCAP_md=$'\e[1;31m' \
+    LESS_TERMCAP_me=$'\e[0m' \
+    LESS_TERMCAP_se=$'\e[0m' \
+    LESS_TERMCAP_so=$'\e[1;44;33m' \
+    LESS_TERMCAP_ue=$'\e[0m' \
+    LESS_TERMCAP_us=$'\e[1;32m' \
+    man "$@"
+}
 
 # Source local bashrc
 if [ -f "$HOME/.bashrc.local" ]; then

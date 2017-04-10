@@ -1,7 +1,7 @@
 @echo off
 
 :: Files to link
-set files=irbrc^
+set files=ctags^
 
 gemrc^
 
@@ -11,11 +11,25 @@ gitconfig^
 
 gitignore_global^
 
+irbrc^
+
 vimrc
+
+:: Files to link into bin
+set binfiles=diff-highlight^
+
+diff-highlight.bat^
+
+diff-hunk-list^
+
+diff-hunk-list.bat
 
 :: Main
 for %%a in (%files%) do (
   call :replaceFile %%a
+)
+for %%a in (%binfiles%) do (
+  call :replaceFile bin\%%a bin\%%a
 )
 goto :EOF
 

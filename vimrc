@@ -5,11 +5,11 @@
 " =============================================================================
 
 function! s:VersionRequirement(val, min)
-  for idx in range(0, len(a:min) - 1)
-    let v = get(a:val, idx, 0)
-    if v < a:min[idx]
+  for l:idx in range(0, len(a:min) - 1)
+    let l:v = get(a:val, l:idx, 0)
+    if l:v < a:min[l:idx]
       return 0
-    elseif v > a:min[idx]
+    elseif l:v > a:min[l:idx]
       return 1
     endif
   endfor
@@ -27,8 +27,8 @@ else
   let s:python26 = 0
 endif
 
-if !empty(&rtp)
-  let s:vimfiles = split(&rtp, ',')[0]
+if !empty(&runtimepath)
+  let s:vimfiles = split(&runtimepath, ',')[0]
 else
   echohl ErrorMsg
   echomsg 'Unable to determine runtime path for Vim.'
@@ -40,7 +40,14 @@ endif
 " Vim Plug: {{{
 " =============================================================================
 
-set nocompatible
+" Define the 'vimrc' autocmd group
+augroup vimrc
+  autocmd!
+augroup END
+
+if &compatible
+  set nocompatible
+endif
 filetype off
 
 " Install vim-plug if it isn't installed and call plug#begin() out of box
@@ -49,15 +56,15 @@ function! s:DownloadVimPlug()
     return
   endif
   if empty(glob(s:vimfiles . '/autoload/plug.vim'))
-    let plug_url = 'https://github.com/junegunn/vim-plug.git'
-    let tmp = tempname()
-    let new = tmp . '/plug.vim'
+    let l:plug_url = 'https://github.com/junegunn/vim-plug.git'
+    let l:tmp = tempname()
+    let l:new = l:tmp . '/plug.vim'
 
     try
-      let out = system(printf('git clone --depth 1 %s %s', plug_url, tmp))
+      let l:out = system(printf('git clone --depth 1 %s %s', l:plug_url, l:tmp))
       if v:shell_error
         echohl ErrorMsg
-        echomsg 'Error downloading vim-plug: ' . out
+        echomsg 'Error downloading vim-plug: ' . l:out
         echohl NONE
         return
       endif
@@ -65,14 +72,14 @@ function! s:DownloadVimPlug()
       if !isdirectory(s:vimfiles . '/autoload')
         call mkdir(s:vimfiles . '/autoload', 'p')
       endif
-      call rename(new, s:vimfiles . '/autoload/plug.vim')
+      call rename(l:new, s:vimfiles . '/autoload/plug.vim')
 
       " Install plugins at first
-      autocmd VimEnter * PlugInstall | quit
+      autocmd vimrc VimEnter * PlugInstall | quit
     finally
-      if isdirectory(tmp)
-        let dir = '"' . escape(tmp, '"') . '"'
-        silent call system((has('win32') ? 'rmdir /S /Q ' : 'rm -rf ') . dir)
+      if isdirectory(l:tmp)
+        let l:dir = '"' . escape(l:tmp, '"') . '"'
+        silent call system((has('win32') ? 'rmdir /S /Q ' : 'rm -rf ') . l:dir)
       endif
     endtry
   endif
@@ -82,8 +89,7 @@ endfunction
 call s:DownloadVimPlug()
 
 " Colorscheme
-Plug 'yous/tomorrow-theme', { 'branch': 'revert-git-summary-bold',
-      \ 'rtp': 'vim' }
+Plug 'yous/vim-open-color'
 
 " General
 " Preserve missing EOL at the end of text files
@@ -101,44 +107,50 @@ if !has('win32')
       " - name: name of the plugin
       " - status: 'installed', 'updated', or 'unchanged'
       " - force: set on PlugInstall! or PlugUpdate!
-      if a:info.status == 'installed' || a:info.force
-        let options = []
-        let requirements = [['clang', '--clang-completer'],
+      if a:info.status ==# 'installed' || a:info.force
+        let l:options = []
+        let l:requirements = [['clang', '--clang-completer'],
               \ ['go', '--gocode-completer'],
               \ ['cargo', '--racer-completer']]
-        for r in requirements
-          if executable(r[0])
-            let options += [r[1]]
+        for l:r in l:requirements
+          if executable(l:r[0])
+            let l:options += [l:r[1]]
           endif
         endfor
-        execute '!./install.py ' . join(options, ' ')
+        execute '!./install.py ' . join(l:options, ' ')
       endif
     endfunction
 
     " A code-completion engine for Vim
-    let BuildYCMRef = function('s:BuildYCM')
-    Plug 'Valloric/YouCompleteMe', { 'do': BuildYCMRef }
-    unlet BuildYCMRef
+    let g:BuildYCMRef = function('s:BuildYCM')
+    Plug 'Valloric/YouCompleteMe', { 'do': g:BuildYCMRef }
+    unlet g:BuildYCMRef
     " Generates config files for YouCompleteMe
     Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
   endif
   " A command-line fuzzy finder written in Go
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-  if !empty(&rtp) && (v:version >= 705 || v:version == 704 && has('patch213'))
-    " Use latest netrw because of https://github.com/tpope/vim-vinegar/issues/58
-    Plug split(&rtp, ',')[0] . '/bundle/netrw'
-  endif
+  Plug 'junegunn/fzf.vim'
+  " A Vim plugin for looking up words in an online thesaurus
+  Plug 'beloglazov/vim-online-thesaurus'
 endif
-" Combine with netrw to create a delicious salad dressing
-Plug 'tpope/vim-vinegar'
+" Enhancing in-buffer search experience
+Plug 'junegunn/vim-slash'
+" Directory viewer for Vim
+Plug 'justinmk/vim-dirvish'
 " Go to Terminal or File manager
 Plug 'justinmk/vim-gtfo'
 " Autocomplete if end
 Plug 'tpope/vim-endwise'
 " Vim sugar for the UNIX shell commands
 Plug 'tpope/vim-eunuch'
-" Syntax checking plugin
-Plug 'scrooloose/syntastic'
+if has('timers') && exists('*job_start') && exists('*ch_close_in')
+  " Asynchronous Lint Engine
+  Plug 'w0rp/ale'
+else
+  " Syntax checking plugin
+  Plug 'vim-syntastic/syntastic'
+endif
 " Automated tag file generation and syntax highlighting of tags
 if executable('ctags')
   Plug 'xolox/vim-misc' |
@@ -195,42 +207,26 @@ if has('signs')
   " Show a git diff in the gutter and stages/reverts hunks
   Plug 'airblade/vim-gitgutter'
 endif
-" The fancy start screen for Vim
-Plug 'mhinz/vim-startify'
 " Distraction-free writing in Vim
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 
 " Support file types
 " AdBlock
-Plug 'mojako/adblock-filter.vim', { 'for': 'adblockfilter' }
+Plug 'yous/adblock-filter.vim', {
+      \ 'branch': 'nocindent',
+      \ 'for': 'adblockfilter' }
 " Aheui
 Plug 'yous/aheui.vim', { 'for': 'aheui' }
-" Coffee script
-Plug 'kchmck/vim-coffee-script', { 'for': ['coffee', 'markdown'] }
-" Crystal
-Plug 'rhysd/vim-crystal', { 'for': ['crystal', 'markdown'] }
-" Cucumber
-Plug 'tpope/vim-cucumber', { 'for': 'cucumber' }
-" Dockerfile
-Plug 'ekalinin/Dockerfile.vim', { 'for': ['Dockerfile', 'markdown'] }
-" fish
-Plug 'dag/vim-fish', { 'for': 'fish' }
-" GLSL
-Plug 'tikhomirov/vim-glsl', { 'for': 'glsl' }
-" Go
-Plug 'fatih/vim-go', { 'for': 'go' }
-" HTML5
-Plug 'othree/html5.vim'
+" CUP
+Plug 'gcollura/cup.vim', { 'for': 'cup' }
+" GNU As
+Plug 'Shirk/vim-gas', { 'for': 'gas' }
 " Jade
 Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
-" JavaScript
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
 " JSON
 Plug 'elzr/vim-json', { 'for': ['json', 'markdown'] }
-" JSX, requires pangloss/vim-javascript
-Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
 " LaTeX
-Plug 'lervag/vimtex', { 'for': 'tex' }
+Plug 'lervag/vimtex', { 'for': ['bib', 'tex'] }
 " Markdown
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -242,16 +238,16 @@ Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
 Plug 'kelwin/vim-smali', { 'for': 'smali' }
 " SMT-LIB
 Plug 'raichoo/smt-vim', { 'for': 'smt' }
-" tmux.conf
-Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
 " Vader
 Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " XML
 Plug 'othree/xml.vim', { 'for': 'xml' }
+" A solid language pack for Vim
+Plug 'sheerun/vim-polyglot'
 
 " Python
 " A nicer Python indentation style for vim
-Plug 'hynek/vim-python-pep8-indent', { 'for': 'python' }
+Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 
 " Ruby
 " Rake
@@ -289,11 +285,6 @@ call plug#end()
 " General: {{{
 " =============================================================================
 
-" Define the 'vimrc' autocmd group
-augroup vimrc
-  autocmd!
-augroup END
-
 if &shell =~# 'fish$'
   set shell=sh
 endif
@@ -301,6 +292,7 @@ if has('gui_running')
   language messages en
   if has('multi_byte')
     set encoding=utf-8
+    scriptencoding utf-8
   endif
 endif
 set autoread
@@ -375,9 +367,10 @@ endif
 " =============================================================================
 
 try
-  colorscheme Tomorrow-Night
+  colorscheme open-color
 catch /^Vim\%((\a\+)\)\=:E185/
   colorscheme default
+  set background=dark
 endtry
 
 if has('syntax') && has('gui_running') && &t_Co > 16
@@ -388,9 +381,6 @@ endif
 set display+=lastline
 " Show unprintable characters as a hex number
 set display+=uhex
-if has('extra_search')
-  set hlsearch
-endif
 " Always show a status line
 set laststatus=2
 set number
@@ -412,6 +402,12 @@ endif
 if has('vertsplit')
   set splitright
 endif
+if empty($TMUX) && empty($STY) && has('termguicolors') &&
+      \ exists('g:colors_name') && g:colors_name !=# 'default'
+  if !has('mac') || $TERM_PROGRAM ==# 'iTerm.app'
+    set termguicolors
+  endif
+endif
 
 augroup colorcolumn
   autocmd!
@@ -426,7 +422,7 @@ augroup END
 
 " Highlight trailing whitespace
 function! s:MatchExtraWhitespace(enabled)
-  if a:enabled && index(['conque_term', 'startify', 'vim-plug'], &filetype) < 0
+  if a:enabled && index(['GV', 'conque_term', 'vim-plug'], &filetype) < 0
     match ExtraWhitespace /\s\+$/
   else
     match ExtraWhitespace //
@@ -439,7 +435,7 @@ augroup ExtraWhitespace
   autocmd FileType * call s:MatchExtraWhitespace(1)
   autocmd InsertEnter * call s:MatchExtraWhitespace(0)
   autocmd InsertLeave * call s:MatchExtraWhitespace(1)
-  if version >= 702
+  if v:version >= 702
     autocmd BufWinLeave * call clearmatches()
   endif
 augroup END
@@ -457,9 +453,6 @@ if has('gui_running')
   set guioptions-=L " Left-hand scrollbar when window is vertically split
 
   source $VIMRUNTIME/delmenu.vim
-  if has('menu') && has('multi_lang')
-    set langmenu=ko.UTF-8
-  endif
   source $VIMRUNTIME/menu.vim
 
   if has('win32')
@@ -481,15 +474,16 @@ if has('gui_running')
     " Restore window size (columns and lines) and position
     " from values stored in vimsize file.
     " Must set font first so columns and lines are based on font size.
-    let f = s:ScreenFilename()
-    if has('gui_running') && g:screen_size_restore_pos && filereadable(f)
-      let vim_instance =
+    let l:f = s:ScreenFilename()
+    if has('gui_running') && g:screen_size_restore_pos && filereadable(l:f)
+      let l:vim_instance =
             \ (g:screen_size_by_vim_instance == 1 ? (v:servername) : 'GVIM')
-      for line in readfile(f)
-        let sizepos = split(line)
-        if len(sizepos) == 5 && sizepos[0] == vim_instance
-          silent! execute 'set columns=' . sizepos[1] . ' lines=' . sizepos[2]
-          silent! execute 'winpos ' . sizepos[3] . ' ' . sizepos[4]
+      for l:line in readfile(l:f)
+        let l:sizepos = split(l:line)
+        if len(l:sizepos) == 5 && l:sizepos[0] == l:vim_instance
+          silent! execute 'set columns=' . l:sizepos[1] .
+                \ ' lines=' . l:sizepos[2]
+          silent! execute 'winpos ' . l:sizepos[3] . ' ' . l:sizepos[4]
           return
         endif
       endfor
@@ -498,20 +492,20 @@ if has('gui_running')
   function! s:ScreenSave()
     " Save window size and position.
     if has('gui_running') && g:screen_size_restore_pos
-      let vim_instance =
+      let l:vim_instance =
             \ (g:screen_size_by_vim_instance == 1 ? (v:servername) : 'GVIM')
-      let data = vim_instance . ' ' . &columns . ' ' . &lines . ' ' .
+      let l:data = l:vim_instance . ' ' . &columns . ' ' . &lines . ' ' .
             \ (getwinposx() < 0 ? 0: getwinposx()) . ' ' .
             \ (getwinposy() < 0 ? 0: getwinposy())
-      let f = s:ScreenFilename()
-      if filereadable(f)
-        let lines = readfile(f)
-        call filter(lines, "v:val !~ '^" . vim_instance . "\\>'")
-        call add(lines, data)
+      let l:f = s:ScreenFilename()
+      if filereadable(l:f)
+        let l:lines = readfile(l:f)
+        call filter(l:lines, "v:val !~ '^" . l:vim_instance . "\\>'")
+        call add(l:lines, l:data)
       else
-        let lines = [data]
+        let l:lines = [l:data]
       endif
-      call writefile(lines, f)
+      call writefile(l:lines, l:f)
     endif
   endfunction
   if !exists('g:screen_size_restore_pos')
@@ -553,7 +547,7 @@ set shiftwidth=2
 set tabstop=8
 " Maximum width of text that is being inserted
 set textwidth=80
-autocmd vimrc FileType c,cpp,java,markdown,python
+autocmd vimrc FileType c,cpp,java,json,markdown,perl,python
       \ setlocal softtabstop=4 shiftwidth=4
 autocmd vimrc FileType gitconfig
       \ setlocal noexpandtab softtabstop=8 shiftwidth=8
@@ -572,8 +566,12 @@ autocmd vimrc FileType *
       \ setlocal formatoptions+=c
       \   formatoptions+=r
       \   formatoptions+=q
-      \   formatoptions+=l
-      \   formatoptions-=o |
+      \   formatoptions+=l |
+      \ if &filetype ==# 'markdown' |
+      \   setlocal formatoptions+=o |
+      \ else |
+      \   setlocal formatoptions-=o |
+      \ endif |
       \ if index(['gitcommit', 'markdown', 'tex'], &filetype) < 0 |
       \   setlocal formatoptions-=t |
       \ endif |
@@ -606,6 +604,17 @@ inoremap <C-A> <Esc>I
 inoremap <C-E> <Esc>A
 cnoremap <C-A> <Home>
 cnoremap <C-E> <End>
+
+" Leave insert mode
+function! s:CtrlL()
+  " Keep the original feature of Ctrl-l. See :help i_CTRL-L.
+  if exists('&insertmode') && &insertmode
+    call feedkeys("\<C-L>", 'n')
+  else
+    call feedkeys("\e", 't')
+  endif
+endfunction
+inoremap <silent> <C-L> <C-O>:call <SID>CtrlL()<CR>
 
 " Make Y behave like C and D
 nnoremap Y y$
@@ -642,29 +651,6 @@ vnoremap / /\v
 cnoremap %s/ %smagic/
 cnoremap \>s/ \>smagic/
 
-" Stop the highlighting for hlsearch
-nnoremap <silent> ,/ :nohlsearch<CR>
-
-" Search for visually selected text
-function! s:VSearch(cmd)
-  let old_reg = getreg('"')
-  let old_regtype = getregtype('"')
-  normal! gvy
-  let @/ = escape(@", a:cmd . '\')
-  normal! gV
-  call setreg('"', old_reg, old_regtype)
-endfunction
-vnoremap * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>
-vnoremap # :<C-U>call <SID>VSearch('?')<CR>?<C-R>"<CR>
-
-" Center display after searching
-nnoremap n nzz
-nnoremap N Nzz
-nnoremap * *zz
-nnoremap # #zz
-nnoremap g* g*zz
-nnoremap g# g#zz
-
 " Execute @q which is recorded by qq
 nnoremap Q @q
 
@@ -682,6 +668,45 @@ function! s:ZoomToggle()
   endif
 endfunction
 nnoremap <silent> <Leader>z :call <SID>ZoomToggle()<CR>
+
+" Cscope mappings
+if has('cscope')
+  function! s:FindCscopeDB()
+    let l:db = findfile('cscope.out', '.;')
+    if !empty(l:db)
+      silent cscope reset
+      silent! execute 'cscope add' l:db
+    elseif !empty($CSCOPE_DB)
+      silent cscope reset
+      silent! execute 'cscope add' $CSCOPE_DB
+    endif
+  endfunction
+
+  set cscopetag
+  set cscopetagorder=0
+  set cscopeverbose
+  call s:FindCscopeDB()
+
+  " 0 or s: Find this C symbol
+  " 1 or g: Find this definition
+  " 2 or d: Find functions called by this function
+  " 3 or c: Find functions calling this function
+  " 4 or t: Find this text string
+  " 6 or e: Find this egrep pattern
+  " 7 or f: Find this file
+  " 8 or i: Find files #including this file
+  " 9 or a: Find places where this symbol is assigned a value
+  nnoremap <C-\>s :cscope find s <C-R>=expand('<cword>')<CR><CR>
+  nnoremap <C-\>g :cscope find g <C-R>=expand('<cword>')<CR><CR>
+  nnoremap <C-\>d :cscope find d <C-R>=expand('<cword>')<CR><CR>
+  nnoremap <C-\>c :cscope find c <C-R>=expand('<cword>')<CR><CR>
+  nnoremap <C-\>t :cscope find t <C-R>=expand('<cword>')<CR><CR>
+  xnoremap <C-\>t y:cscope find t <C-R>"<CR>
+  nnoremap <C-\>e :cscope find e <C-R>=expand('<cword>')<CR><CR>
+  nnoremap <C-\>f :cscope find f <C-R>=expand('<cfile>')<CR><CR>
+  nnoremap <C-\>i :cscope find i ^<C-R>=expand('<cfile>')<CR>$<CR>
+  nnoremap <C-\>a :cscope find a <C-R>=expand('<cword>')<CR><CR>
+endif
 
 augroup vimrc
   " Quit help window
@@ -735,22 +760,30 @@ endif
 " Auto quit Vim when actual files are closed
 function! s:CheckLeftBuffers()
   if tabpagenr('$') == 1
-    let i = 1
-    while i <= winnr('$')
+    let l:i = 1
+    while l:i <= winnr('$')
       let l:filetypes = ['help', 'quickfix', 'nerdtree', 'taglist']
-      if index(l:filetypes, getbufvar(winbufnr(i), '&filetype')) >= 0 ||
-            \ getwinvar(i, '&previewwindow')
-        let i += 1
+      if index(l:filetypes, getbufvar(winbufnr(l:i), '&filetype')) >= 0 ||
+            \ getwinvar(l:i, '&previewwindow')
+        let l:i += 1
       else
         break
       endif
     endwhile
-    if i == winnr('$') + 1
+    if l:i == winnr('$') + 1
       call feedkeys(":only\<CR>:q\<CR>", 'n')
     endif
   endif
 endfunction
 autocmd vimrc BufEnter * call s:CheckLeftBuffers()
+
+if has('win32')
+  command! Gdiffs cexpr system('git diff \| diff-hunk-list.bat') |
+        \ cwindow | wincmd p
+else
+  command! Gdiffs cexpr system('git diff \| diff-hunk-list') |
+        \ cwindow | wincmd p
+endif
 
 " }}}
 " =============================================================================
@@ -764,6 +797,9 @@ augroup vimrc
   " Exit Paste mode when leaving Insert mode
   autocmd InsertLeave * set nopaste
 
+  " Check if any buffers were changed outside of Vim
+  autocmd FocusGained,BufEnter * checktime
+
   " Keyword lookup program
   autocmd FileType c,cpp setlocal keywordprg=man
   autocmd FileType gitconfig
@@ -772,7 +808,7 @@ augroup vimrc
   autocmd FileType ruby setlocal keywordprg=ri
 
   " Plain view for plugins
-  autocmd FileType conque_term,startify,vim-plug
+  autocmd FileType GV,conque_term,vim-plug
         \ setlocal colorcolumn= nolist textwidth=0
 
   " Ruby configuration files view
@@ -796,12 +832,12 @@ augroup vimrc
 augroup END
 
 " Reload symlink of vimrc on the fly
-let resolved_vimrc = resolve(expand($MYVIMRC))
-if expand($MYVIMRC) !=# resolved_vimrc
-  execute 'autocmd vimrc BufWritePost ' . resolved_vimrc .
+let s:resolved_vimrc = resolve(expand($MYVIMRC))
+if expand($MYVIMRC) !=# s:resolved_vimrc
+  execute 'autocmd vimrc BufWritePost ' . s:resolved_vimrc .
         \ ' nested source $MYVIMRC'
 endif
-unlet resolved_vimrc
+unlet s:resolved_vimrc
 
 " }}}
 " =============================================================================
@@ -838,26 +874,42 @@ if exists('s:vimfiles')
 endif
 let g:ycm_confirm_extra_conf = 0
 
+" vim-slash
+" Center display after searching
+noremap <Plug>(slash-after) zz
+
+" ale
+if has_key(g:plugs, 'ale')
+  let g:ale_lint_on_save = 1
+  let g:ale_lint_on_text_changed = 0
+  let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']
+  let g:ale_ruby_rubocop_options = '--display-cop-names'
+endif
+
 " Syntastic
-" Skip checks when you issue :wq, :x and :ZZ
-let g:syntastic_check_on_wq = 0
-" Display all of the errors from all of the checkers together
-let g:syntastic_aggregate_errors = 1
-" Sort errors by file, line number, type, column number
-let g:syntastic_sort_aggregated_errors = 1
-" Turn off highlighting for marking errors
-let g:syntastic_enable_highlighting = 0
-" Always stick any detected errors into the location-list
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_mode_map = { 'mode': 'passive' }
-" Check header files
-let g:syntastic_c_check_header = 1
-let g:syntastic_cpp_check_header = 1
-" Enable JSCS for JavaScript files
-let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'jscs']
-" Extend max error count for JSLint
-let g:syntastic_javascript_jslint_args = '--white --nomen --regexp --plusplus
-      \ --bitwise --newcap --sloppy --vars --maxerr=1000'
+if has_key(g:plugs, 'syntastic')
+  " Skip checks when you issue :wq, :x and :ZZ
+  let g:syntastic_check_on_wq = 0
+  " Display all of the errors from all of the checkers together
+  let g:syntastic_aggregate_errors = 1
+  " Sort errors by file, line number, type, column number
+  let g:syntastic_sort_aggregated_errors = 1
+  " Turn off highlighting for marking errors
+  let g:syntastic_enable_highlighting = 0
+  " Always stick any detected errors into the location-list
+  let g:syntastic_always_populate_loc_list = 1
+  let g:syntastic_mode_map = { 'mode': 'passive' }
+  " Check header files
+  let g:syntastic_c_check_header = 1
+  let g:syntastic_cpp_check_header = 1
+  " Enable JSCS for JavaScript files
+  let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'jscs']
+  " Extend max error count for JSLint
+  let g:syntastic_javascript_jslint_args = '--white --nomen --regexp --plusplus
+        \ --bitwise --newcap --sloppy --vars --maxerr=1000'
+  " Enable Vint for Vim files
+  let g:syntastic_javascript_checkers = ['vimlint', 'vint']
+endif
 
 " vim-shell
 let g:shell_hl_exclude = '^.*$'
@@ -866,6 +918,7 @@ let g:shell_mappings_enabled = 0
 " vim-easytags
 let g:easytags_auto_highlight = 0
 let g:easytags_async = 1
+let g:easytags_dynamic_files = 1
 
 " Fugitive
 let s:fugitive_insert = 0
@@ -957,7 +1010,7 @@ let g:lightline = {
       \     ['mode', 'paste'],
       \     ['filename', 'readonly', 'eol', 'modified']],
       \   'right': [
-      \     ['syntastic', 'lineinfo'],
+      \     [has_key(g:plugs, 'ale') ? 'ale' : 'syntastic', 'lineinfo'],
       \     ['percent'],
       \     ['filetype', 'fileencoding', 'fileformat']] },
       \ 'tabline': { 'left': [['tabs']], 'right': [[]] },
@@ -969,43 +1022,46 @@ let g:lightline = {
       \ 'component_expand': {
       \   'readonly': 'LightLineReadonly',
       \   'eol': 'LightLineEol',
+      \   'ale': 'ALEGetStatusLine',
       \   'syntastic': 'SyntasticStatuslineFlag' },
       \ 'component_type': {
       \   'readonly': 'warning',
       \   'eol': 'warning',
+      \   'ale': 'error',
       \   'syntastic': 'error' },
       \ 'separator': { 'left': '', 'right': '' },
       \ 'subseparator': { 'left': '', 'right': '|' } }
 
-for k in ['mode', 'filename', 'modified', 'filetype', 'fileencoding',
+for s:k in ['mode', 'filename', 'modified', 'filetype', 'fileencoding',
       \ 'fileformat', 'percent', 'lineinfo']
-  let g:lightline.component_function[k] = 'LightLine' . toupper(k[0]) . k[1:]
+  let g:lightline.component_function[s:k] =
+        \ 'LightLine' . toupper(s:k[0]) . s:k[1:]
 endfor
-for k in ['filename', 'modified']
-  let g:lightline.tab_component_function['tab' . k] =
-        \ 'LightLineTab' . toupper(k[0]) . k[1:]
+for s:k in ['filename', 'modified']
+  let g:lightline.tab_component_function['tab' . s:k] =
+        \ 'LightLineTab' . toupper(s:k[0]) . s:k[1:]
 endfor
 
 function! LightLineWide(component)
-  let component_visible_width = {
+  let l:component_visible_width = {
         \ 'mode': 60,
         \ 'fileencoding': 70,
         \ 'fileformat': 70,
         \ 'filetype': 70,
         \ 'percent': 50 }
-  return winwidth(0) >= get(component_visible_width, a:component, 0)
+  return winwidth(0) >= get(l:component_visible_width, a:component, 0)
 endfunction
 
 function! LightLineVisible(component)
-  let fname = expand('%:t')
-  return fname != '__Tag_List__' &&
-        \ fname != 'ControlP' &&
-        \ fname !~ 'NERD_tree' &&
+  let l:fname = expand('%:t')
+  return l:fname !=# '__Tag_List__' &&
+        \ l:fname !=# 'ControlP' &&
+        \ l:fname !~# 'NERD_tree' &&
         \ LightLineWide(a:component)
 endfunction
 
 function! LightLineMode()
-  let short_mode_map = {
+  let l:short_mode_map = {
         \ 'n': 'N',
         \ 'i': 'I',
         \ 'R': 'R',
@@ -1018,22 +1074,22 @@ function! LightLineMode()
         \ "\<C-s>": 'S',
         \ 't': 'T',
         \ '?': ' ' }
-  let fname = expand('%:t')
-  return fname == '__Tag_List__' ? 'TagList' :
-        \ fname == 'ControlP' ? 'CtrlP' :
-        \ fname =~ 'NERD_tree' ? '' :
+  let l:fname = expand('%:t')
+  return l:fname ==# '__Tag_List__' ? 'TagList' :
+        \ l:fname ==# 'ControlP' ? 'CtrlP' :
+        \ l:fname =~# 'NERD_tree' ? '' :
         \ LightLineWide('mode') ? lightline#mode() :
-        \ get(short_mode_map, mode(), short_mode_map['?'])
+        \ get(l:short_mode_map, mode(), l:short_mode_map['?'])
 endfunction
 
 function! LightLineFilename()
-  let fname = expand('%:t')
-  return fname == '__Tag_List__' ? '' :
-        \ fname == 'ControlP' ? '' :
-        \ fname =~ 'NERD_tree' ?
+  let l:fname = expand('%:t')
+  return l:fname ==# '__Tag_List__' ? '' :
+        \ l:fname ==# 'ControlP' ? '' :
+        \ l:fname =~# 'NERD_tree' ?
         \   (index(['" Press ? for help', '.. (up a dir)'], getline('.')) < 0 ?
         \     matchstr(getline('.'), '[0-9A-Za-z_/].*') : '') :
-        \ '' != fname ? fname : '[No Name]'
+        \ '' !=# l:fname ? l:fname : '[No Name]'
 endfunction
 
 function! LightLineReadonly()
@@ -1041,7 +1097,7 @@ function! LightLineReadonly()
 endfunction
 
 function! LightLineEol()
-  return &eol ? '' : 'NOEOL'
+  return &endofline ? '' : 'NOEOL'
 endfunction
 
 function! LightLineModified()
@@ -1054,7 +1110,8 @@ function! LightLineFiletype()
 endfunction
 
 function! LightLineFileencoding()
-  return LightLineVisible('fileencoding') ? (strlen(&fenc) ? &fenc : &enc) : ''
+  return LightLineVisible('fileencoding') ?
+        \ (strlen(&fileencoding) ? &fileencoding : &encoding) : ''
 endfunction
 
 function! LightLineFileformat()
@@ -1067,57 +1124,68 @@ endfunction
 
 function! LightLineLineinfo()
   return LightLineVisible('lineinfo') ?
-        \ printf("%3d:%-2d", line('.'), col('.')) : ''
+        \ printf('%3d:%-2d', line('.'), col('.')) : ''
 endfunction
 
 function! LightLineTabFilename(n)
-  let buflist = tabpagebuflist(a:n)
-  let winnr = tabpagewinnr(a:n)
-  let fname = expand('#' . buflist[winnr - 1] . ':t')
-  let filetype = gettabwinvar(a:n, winnr, '&filetype')
-  return filetype == 'GV' ? 'GV' :
-        \ '' != fname ? fname : '[No Name]'
+  let l:buflist = tabpagebuflist(a:n)
+  let l:winnr = tabpagewinnr(a:n)
+  let l:fname = expand('#' . l:buflist[l:winnr - 1] . ':t')
+  let l:filetype = gettabwinvar(a:n, l:winnr, '&filetype')
+  return l:filetype ==# 'GV' ? 'GV' :
+        \ '' !=# l:fname ? l:fname : '[No Name]'
 endfunction
 
 function! LightLineTabModified(n)
-  let winnr = tabpagewinnr(a:n)
-  return gettabwinvar(a:n, winnr, '&modified') ? '+' : ''
+  let l:winnr = tabpagewinnr(a:n)
+  return gettabwinvar(a:n, l:winnr, '&modified') ? '+' : ''
 endfunction
 
-let g:lightline.syntastic_mode_active = 1
-augroup LightLineSyntastic
-  autocmd!
-  autocmd BufWritePost * call s:LightLineSyntastic()
-augroup END
+if has_key(g:plugs, 'ale')
+  augroup LightLineALE
+    autocmd!
+    autocmd User ALELint call s:LightLineALE()
+  augroup END
 
-function! s:LightLineSyntastic()
-  if g:lightline.syntastic_mode_active
-    SyntasticCheck
+  function! s:LightLineALE()
     if exists('#lightline')
       call lightline#update()
     endif
-  endif
-endfunction
-command! LightLineSyntastic call s:LightLineSyntastic()
+  endfunction
+endif
 
-function! s:LightLineSyntasticToggleMode()
-  if g:lightline.syntastic_mode_active
-    let g:lightline.syntastic_mode_active = 0
-    echo 'Syntastic: passive mode enabled'
-  else
-    let g:lightline.syntastic_mode_active = 1
-    echo 'Syntastic: active mode enabled'
-  endif
-  SyntasticReset
-endfunction
-command! LightLineSyntasticToggleMode call s:LightLineSyntasticToggleMode()
+if has_key(g:plugs, 'syntastic')
+  let g:lightline.syntastic_mode_active = 1
+  augroup LightLineSyntastic
+    autocmd!
+    autocmd BufWritePost * call s:LightLineSyntastic()
+  augroup END
+
+  function! s:LightLineSyntastic()
+    if g:lightline.syntastic_mode_active
+      SyntasticCheck
+      if exists('#lightline')
+        call lightline#update()
+      endif
+    endif
+  endfunction
+  command! LightLineSyntastic call s:LightLineSyntastic()
+
+  function! s:LightLineSyntasticToggleMode()
+    if g:lightline.syntastic_mode_active
+      let g:lightline.syntastic_mode_active = 0
+      echo 'Syntastic: passive mode enabled'
+    else
+      let g:lightline.syntastic_mode_active = 1
+      echo 'Syntastic: active mode enabled'
+    endif
+    SyntasticReset
+  endfunction
+  command! LightLineSyntasticToggleMode call s:LightLineSyntasticToggleMode()
+endif
 
 " rainbow_parentheses.vim
 autocmd vimrc FileType clojure,lisp,racket,scheme RainbowParentheses
-
-" vim-startify
-" let g:startify_custom_header = startify#fortune#cowsay()
-let g:startify_custom_header = 'map(startify#fortune#boxed(), "\"   \".v:val")'
 
 " goyo.vim
 nnoremap <Leader>G :Goyo<CR>
@@ -1129,10 +1197,39 @@ let g:adblock_filter_auto_checksum = 1
 let g:vim_json_syntax_conceal = 0
 
 " vimtex
-let g:vimtex_view_enabled = 0
+if has('win32unix')
+  let g:vimtex_complete_enabled = 0
+  let g:vimtex_latexmk_enabled = 0
+  let g:vimtex_view_enabled = 0
+endif
+if !has('clientserver')
+  let g:vimtex_latexmk_callback = 0
+endif
+if !empty(glob('/Applications/Skim.app'))
+  let g:vimtex_view_general_viewer =
+        \ '/Applications/Skim.app/Contents/SharedSupport/displayline'
+  let g:vimtex_view_general_options = '-r @line @pdf @tex'
+elseif executable('SumatraPDF.exe')
+  let g:vimtex_view_general_viewer = 'SumatraPDF'
+  let g:vimtex_view_general_options =
+        \ '-reuse-instance -forward-search @tex @line @pdf'
+  let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+endif
+let g:vimtex_syntax_minted = [
+      \ {
+      \   'lang': 'c'
+      \ },
+      \ {
+      \   'lang': 'cpp'
+      \ },
+      \ {
+      \   'lang': 'python'
+      \ },
+      \ {
+      \   'lang': 'ruby'
+      \ }]
 
 " vim-markdown
-let g:vim_markdown_no_default_key_mappings = 1
 let g:vim_markdown_fenced_languages = [
       \ 'bat=dosbatch', 'batch=dosbatch',
       \ 'coffeescript=coffee',
@@ -1146,14 +1243,21 @@ let g:vim_markdown_fenced_languages = [
       \ 'bash=sh',
       \ 'viml=vim']
 let g:vim_markdown_frontmatter = 1
+nnoremap <Plug> <Plug>Markdown_EditUrlUnderCursor
+vnoremap <Plug> <Plug>Markdown_EditUrlUnderCursor
+
+" vim-polyglot
+let g:polyglot_disabled = ['json', 'latex', 'markdown', 'python']
+" vim-javascript
+let g:javascript_plugin_jsdoc = 1
 
 " vim-rake
-nmap <Leader>ra :Rake<CR>
+nnoremap <Leader>ra :Rake<CR>
 
 " vim-rubocop
 let g:vimrubocop_extra_args = '--display-cop-names'
 let g:vimrubocop_keymap = 0
-nmap <Leader>ru :RuboCop<CR>
+nnoremap <Leader>ru :RuboCop<CR>
 
 " AnsiEsc.vim
 autocmd vimrc FileType railslog :AnsiEsc
@@ -1163,7 +1267,7 @@ if has('mac') || has('macunix')
   " dash.vim
   let g:dash_map = {
         \ 'java' : 'android' }
-  nmap <Leader>d <Plug>DashSearch
+  nnoremap <Leader>d <Plug>DashSearch
 endif
 
 " }}}

@@ -178,6 +178,7 @@ case "$1" in
     init_submodules
     for FILENAME in \
       'bashrc' \
+      'ctags' \
       'gemrc' \
       'gitattributes_global' \
       'gitconfig' \
@@ -188,7 +189,7 @@ case "$1" in
       'profile' \
       'screenrc' \
       'tmux.conf' \
-      'vim/bundle/netrw' \
+      'vintrc.yaml' \
       'vimrc' \
       'weechat' \
       'zprofile' \
@@ -198,13 +199,17 @@ case "$1" in
     done
 
     replace_file 'tpm' '.tmux/plugins/tpm'
-    for FILENAME in bin/*
+    for FILENAME in \
+      'diff-highlight' \
+      'diff-hunk-list'
     do
-      replace_file "$FILENAME" "$FILENAME"
+      replace_file "bin/$FILENAME" "bin/$FILENAME"
     done
     echo 'Done.'
     ;;
-
+  antibody)
+    curl -sL https://git.io/antibody | bash -s
+    ;;
   brew)
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     ;;
@@ -262,6 +267,7 @@ case "$1" in
     echo '    ftp       Install vsftpd with self-signed certificate'
     echo '    github    Install github account'
     echo '    link      Install symbolic links'
+    echo '    antibody  Install Antibody'
     echo '    brew      Install Homebrew'
     echo '    formulae  Install Homebrew formulae using Brewfile'
     echo '    npm       Install global Node.js packages'

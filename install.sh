@@ -112,7 +112,14 @@ case "$1" in
         echo "already exists"
       fi
     else
-      echo "does not need pwndbg for Mac"
+      if [[ ! -e "$HOME/.gdb/pwndbg" ]]; then
+      brew install gdb
+      git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
+      cd ~/.gdb/pwndbg
+      ./setup.sh
+      else
+        echo "already exists"
+      fi
     fi
     ;;
 

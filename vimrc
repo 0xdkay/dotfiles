@@ -46,7 +46,9 @@ augroup vimrc
 augroup END
 
 if &compatible
+  " vint: -ProhibitSetNoCompatible
   set nocompatible
+  " vint: +ProhibitSetNoCompatible
 endif
 filetype off
 
@@ -94,13 +96,11 @@ Plug 'yous/vim-open-color'
 " General
 " Preserve missing EOL at the end of text files
 Plug 'yous/PreserveNoEOL'
-" EditorConfig
-if executable('editorconfig') == 1 || has('python3') || s:python26
-  Plug 'editorconfig/editorconfig-vim'
-endif
+" Yet another EditorConfig plugin for vim written in vimscript only
+Plug 'sgur/vim-editorconfig'
 if !has('win32')
   if !has('win32unix') &&
-        \ (v:version >= 704 || v:version == 703 && has('patch598')) &&
+        \ (v:version >= 705 || v:version == 704 && has('patch1578')) &&
         \ executable('cmake') && (has('python3') || s:python26)
     function! s:BuildYCM(info)
       " info is a dictionary with 3 fields
@@ -128,18 +128,20 @@ if !has('win32')
     " Generates config files for YouCompleteMe
     Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
   endif
-  " A command-line fuzzy finder written in Go
-  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-  Plug 'junegunn/fzf.vim'
+  if $MSYSTEM !=# 'MSYS' || executable('go')
+    " A command-line fuzzy finder written in Go
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+  endif
   " A Vim plugin for looking up words in an online thesaurus
   Plug 'beloglazov/vim-online-thesaurus'
 endif
-" Enhancing in-buffer search experience
-Plug 'junegunn/vim-slash'
 " Directory viewer for Vim
 Plug 'justinmk/vim-dirvish'
 " Go to Terminal or File manager
 Plug 'justinmk/vim-gtfo'
+" obsession.vim: continuously updated session files
+Plug 'tpope/vim-obsession'
 " Autocomplete if end
 Plug 'tpope/vim-endwise'
 " Vim sugar for the UNIX shell commands
@@ -175,18 +177,20 @@ Plug 'yous/conque', { 'on': [
 Plug 'bkad/CamelCaseMotion'
 " Vim motions on speed!
 Plug 'easymotion/vim-easymotion'
-" Extended % matching
-Plug 'matchit.zip'
+" Extended % matching for HTML, LaTeX, and many other languages
+Plug 'tmhedberg/matchit'
 " Simplify the transition between multiline and single-line code
 Plug 'AndrewRadev/splitjoin.vim'
 " Easily delete, change and add surroundings in pairs
 Plug 'tpope/vim-surround'
 " Pairs of handy bracket mappings
 Plug 'tpope/vim-unimpaired'
-" Produce increasing/decreasing columns of numbers, dates, or daynames
-Plug 'visincr'
+if v:version >= 700
+  " Produce increasing/decreasing columns of numbers, dates, or daynames
+  Plug 'vim-scripts/VisIncr'
+endif
 " Switch between source files and header files
-Plug 'a.vim'
+Plug 'vim-scripts/a.vim'
 " Enable repeating supported plugin maps with "."
 Plug 'tpope/vim-repeat'
 " Explore filesystem
@@ -231,7 +235,7 @@ Plug 'lervag/vimtex', { 'for': ['bib', 'tex'] }
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " PHP
-Plug 'php.vim-html-enhanced', { 'for': ['html', 'php'] }
+Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
 " Racket
 Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
 " smali
@@ -256,8 +260,10 @@ Plug 'tpope/vim-rake'
 Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
 " Rails
 Plug 'tpope/vim-rails'
-" ANSI escape
-Plug 'AnsiEsc.vim', { 'for': 'railslog' }
+if v:version >= 700
+  " ANSI escape sequences concealed, but highlighted as specified (conceal)
+  Plug 'powerman/vim-plugin-AnsiEsc', { 'for': 'railslog' }
+endif
 " TomDoc
 Plug 'wellbredgrapefruit/tomdoc.vim', { 'for': 'ruby' }
 " LanguageTool
@@ -549,7 +555,7 @@ set tabstop=8
 set textwidth=80
 autocmd vimrc FileType c,cpp,java,json,markdown,perl,python
       \ setlocal softtabstop=4 shiftwidth=4
-autocmd vimrc FileType gitconfig
+autocmd vimrc FileType asm,gitconfig,kconfig
       \ setlocal noexpandtab softtabstop=8 shiftwidth=8
 autocmd vimrc FileType go
       \ setlocal noexpandtab softtabstop=4 shiftwidth=4 tabstop=4
@@ -607,7 +613,7 @@ cnoremap <C-E> <End>
 
 " Leave insert mode
 function! s:CtrlL()
-  " Keep the original feature of Ctrl-l. See :help i_CTRL-L.
+  " Keep the original feature of CTRL-L. See :help i_CTRL-L.
   if exists('&insertmode') && &insertmode
     call feedkeys("\<C-L>", 'n')
   else
@@ -622,7 +628,7 @@ nnoremap Y y$
 " Delete without copying
 vnoremap <BS> "_d
 
-" Break the undo block when Ctrl-u
+" Break the undo block when CTRL-U
 inoremap <C-U> <C-G>u<C-U>
 
 if has('wildmenu')
@@ -650,6 +656,31 @@ nnoremap / /\v
 vnoremap / /\v
 cnoremap %s/ %smagic/
 cnoremap \>s/ \>smagic/
+
+" Use CTRL-N to clear the highlighting and screen
+nnoremap <silent> <C-N> :nohlsearch<C-R>=has('diff') ? '<Bar>diffupdate' : ''<CR><CR><C-L>
+
+" Search for visually selected text
+function! s:VSearch(cmd)
+  let l:old_reg = getreg('"')
+  let l:old_regtype = getregtype('"')
+  normal! gvy
+  let l:pat = escape(@", a:cmd . '\')
+  let l:pat = substitute(l:pat, '\n', '\\n', 'g')
+  let @/ = '\V' . l:pat
+  normal! gV
+  call setreg('"', l:old_reg, l:old_regtype)
+endfunction
+vnoremap * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>
+vnoremap # :<C-U>call <SID>VSearch('?')<CR>?<C-R>/<CR>
+
+" Center display after searching
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap * *zz
+nnoremap # #zz
+nnoremap g* g*zz
+nnoremap g# g#zz
 
 " Execute @q which is recorded by qq
 nnoremap Q @q
@@ -794,6 +825,9 @@ augroup vimrc
   " Reload vimrc on the fly
   autocmd BufWritePost $MYVIMRC nested source $MYVIMRC
 
+  " Automatically update the diff after writing changes
+  autocmd BufWritePost * if &diff | diffupdate | endif
+
   " Exit Paste mode when leaving Insert mode
   autocmd InsertLeave * set nopaste
 
@@ -814,11 +848,17 @@ augroup vimrc
   " Ruby configuration files view
   autocmd BufNewFile,BufRead Gemfile,Guardfile setlocal filetype=ruby
 
+  " ASM view
+  autocmd BufNewFile,BufRead *.S setlocal filetype=gas
+
   " Gradle view
   autocmd BufNewFile,BufRead *.gradle setlocal filetype=groovy
 
   " Json view
   autocmd BufNewFile,BufRead *.json setlocal filetype=json
+
+  " LD script view
+  autocmd BufNewFile,BufRead *.lds setlocal filetype=ld
 
   " Markdown view
   autocmd BufNewFile,BufRead *.md setfiletype markdown
@@ -847,12 +887,8 @@ unlet s:resolved_vimrc
 " PreserveNoEOL
 let g:PreserveNoEOL = 1
 
-" EditorConfig
-if executable('editorconfig')
-  let g:EditorConfig_core_mode = 'external_command'
-endif
-
 " YouCompleteMe
+let g:ycm_min_num_of_chars_for_completion = 4
 let g:ycm_filetype_blacklist = {
       \ 'diff': 1,
       \ 'infolog': 1,
@@ -874,12 +910,11 @@ if exists('s:vimfiles')
 endif
 let g:ycm_confirm_extra_conf = 0
 
-" vim-slash
-" Center display after searching
-noremap <Plug>(slash-after) zz
-
 " ale
 if has_key(g:plugs, 'ale')
+  let g:ale_echo_msg_error_str = 'E'
+  let g:ale_echo_msg_warning_str = 'W'
+  let g:ale_echo_msg_format = '[%linter%][%severity%] %s'
   let g:ale_lint_on_save = 1
   let g:ale_lint_on_text_changed = 0
   let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']
@@ -1245,6 +1280,8 @@ let g:vim_markdown_fenced_languages = [
 let g:vim_markdown_frontmatter = 1
 nnoremap <Plug> <Plug>Markdown_EditUrlUnderCursor
 vnoremap <Plug> <Plug>Markdown_EditUrlUnderCursor
+nnoremap <Plug> <Plug>Markdown_MoveToCurHeader
+vnoremap <Plug> <Plug>Markdown_MoveToCurHeader
 
 " vim-polyglot
 let g:polyglot_disabled = ['json', 'latex', 'markdown', 'python']

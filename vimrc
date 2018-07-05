@@ -190,13 +190,13 @@ if v:version >= 700
   Plug 'vim-scripts/VisIncr'
 endif
 " Switch between source files and header files
-Plug 'vim-scripts/a.vim'
+"Plug 'vim-scripts/a.vim'
 " Enable repeating supported plugin maps with "."
 Plug 'tpope/vim-repeat'
 " Explore filesystem
-Plug 'scrooloose/nerdtree'
+"Plug 'scrooloose/nerdtree'
 " Source code browser
-Plug 'taglist.vim'
+"Plug 'taglist.vim'
 
 " Vim UI
 " A light and configurable statusline/tabline for Vim
@@ -220,11 +220,11 @@ Plug 'yous/adblock-filter.vim', {
       \ 'branch': 'nocindent',
       \ 'for': 'adblockfilter' }
 " Aheui
-Plug 'yous/aheui.vim', { 'for': 'aheui' }
+"Plug 'yous/aheui.vim', { 'for': 'aheui' }
 " CUP
-Plug 'gcollura/cup.vim', { 'for': 'cup' }
+"Plug 'gcollura/cup.vim', { 'for': 'cup' }
 " GNU As
-Plug 'Shirk/vim-gas', { 'for': 'gas' }
+"Plug 'Shirk/vim-gas', { 'for': 'gas' }
 " Jade
 Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
 " JSON
@@ -237,13 +237,13 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " PHP
 Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
 " Racket
-Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
+"Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
 " smali
 Plug 'kelwin/vim-smali', { 'for': 'smali' }
 " SMT-LIB
 Plug 'raichoo/smt-vim', { 'for': 'smt' }
 " Vader
-Plug 'junegunn/vader.vim', { 'for': 'vader' }
+"Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " XML
 Plug 'othree/xml.vim', { 'for': 'xml' }
 " A solid language pack for Vim
@@ -254,20 +254,20 @@ Plug 'sheerun/vim-polyglot'
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 
 " Ruby
-" Rake
-Plug 'tpope/vim-rake'
-" RuboCop
-Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
-" Rails
-Plug 'tpope/vim-rails'
-if v:version >= 700
-  " ANSI escape sequences concealed, but highlighted as specified (conceal)
-  Plug 'powerman/vim-plugin-AnsiEsc', { 'for': 'railslog' }
-endif
-" TomDoc
-Plug 'wellbredgrapefruit/tomdoc.vim', { 'for': 'ruby' }
-" LanguageTool
-Plug 'vim-scripts/LanguageTool'
+"" Rake
+"Plug 'tpope/vim-rake'
+"" RuboCop
+"Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
+"" Rails
+"Plug 'tpope/vim-rails'
+"if v:version >= 700
+"  " ANSI escape sequences concealed, but highlighted as specified (conceal)
+"  Plug 'powerman/vim-plugin-AnsiEsc', { 'for': 'railslog' }
+"endif
+"" TomDoc
+"Plug 'wellbredgrapefruit/tomdoc.vim', { 'for': 'ruby' }
+"" LanguageTool
+"Plug 'vim-scripts/LanguageTool'
 
 " Mac OS
 if has('mac') || has('macunix')

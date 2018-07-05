@@ -95,9 +95,9 @@ case "$1" in
     sudo apt-get -y dist-upgrade
 
     # install softwares
-    sudo apt-get install -y vim exuberant-ctags zsh
-    sudo apt-get install -y tmux
+    sudo apt-get install -y vim zsh tmux
     sudo apt-get install build-essential python-dev python-pip
+    # sudo apt-get install -y exuberant-ctags
     ;;
 
   gdb)
@@ -258,12 +258,30 @@ case "$1" in
     command curl -sSL https://get.rvm.io | bash -s stable
     ;;
 
+  conda)
+    if [ ! -f ~/Anaconda3-5.2.0-Linux-x86_64.sh ]; then
+      wget https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh -O ~/
+      chmod +x ~/Anaconda3-5.2.0-Linux-x86_64.sh
+    fi
+    bash ~/Anaconda3-5.2.0-Linux-x86_64.sh
+    ;;
+
+  conda2)
+    if [ ! -f ~/Anaconda2-5.2.0-Linux-x86_64.sh ]; then
+      wget https://repo.anaconda.com/archive/Anaconda2-5.2.0-Linux-x86_64.sh -O ~/
+      chmod +x ~/Anaconda2-5.2.0-Linux-x86_64.sh
+    fi
+    bash ~/Anaconda2-5.2.0-Linux-x86_64.sh
+    ;;
+
   *)
     echo "usage: $(basename "$0") <command>"
     echo ''
     echo 'Available commands:'
     echo '    update    Update installed packages'
     echo '    base      Install basic packages'
+    echo '    conda     Install Anaconda Python 3.6 packages'
+    echo '    conda2    Install Anaconda Python 2.7 packages'
     echo '    gdb       Install pwndbg'
     echo '    apache    Install apache, mysql, php7.0'
     echo '    ftp       Install vsftpd with self-signed certificate'

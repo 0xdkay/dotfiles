@@ -121,12 +121,12 @@ if !has('win32')
       endif
     endfunction
 
-    " A code-completion engine for Vim
-    let g:BuildYCMRef = function('s:BuildYCM')
-    Plug 'Valloric/YouCompleteMe', { 'do': g:BuildYCMRef }
-    unlet g:BuildYCMRef
-    " Generates config files for YouCompleteMe
-    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+"    " A code-completion engine for Vim
+"    let g:BuildYCMRef = function('s:BuildYCM')
+"    Plug 'Valloric/YouCompleteMe', { 'do': g:BuildYCMRef }
+"    unlet g:BuildYCMRef
+"    " Generates config files for YouCompleteMe
+"    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
   endif
   if $MSYSTEM !=# 'MSYS' || executable('go')
     " A command-line fuzzy finder written in Go

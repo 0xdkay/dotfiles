@@ -208,9 +208,19 @@ case "$1" in
     done
     echo 'Done.'
     ;;
+
+  ycm)
+    sudo apt-get install -y build-essential cmake
+    sudo apt-get install -y python-dev python3-dev
+
+    cd ~/.vim/plugged/YouCompleteMe
+    ./install.py --clang-completer
+    ;;
+
   antibody)
     curl -sL https://git.io/antibody | bash -s
     ;;
+
   brew)
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     ;;
@@ -280,14 +290,15 @@ case "$1" in
     echo 'Available commands:'
     echo '    update    Update installed packages'
     echo '    base      Install basic packages'
-    echo '    conda     Install Anaconda Python 3.6 packages'
-    echo '    conda2    Install Anaconda Python 2.7 packages'
-    echo '    gdb       Install pwndbg'
-    echo '    apache    Install apache, mysql, php7.0'
-    echo '    ftp       Install vsftpd with self-signed certificate'
-    echo '    github    Install github account'
     echo '    link      Install symbolic links'
     echo '    antibody  Install Antibody'
+    echo '    gdb       Install pwndbg'
+    echo '    github    Install github account'
+    echo '    conda     Install Anaconda Python 3.6 packages'
+    echo '    conda2    Install Anaconda Python 2.7 packages'
+    echo '    ycm       Install YouCompleteMe'
+    echo '    apache    Install apache, mysql, php7.0'
+    echo '    ftp       Install vsftpd with self-signed certificate'
     echo '    brew      Install Homebrew'
     echo '    formulae  Install Homebrew formulae using Brewfile'
     echo '    npm       Install global Node.js packages'

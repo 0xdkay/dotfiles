@@ -129,12 +129,12 @@ case "$1" in
     echo "apache is running on ....."
     ifconfig eth0 | grep inet | awk '{ print $2 }'
 
-    sudo apt-get install -y mysql-server libapache2-mod-auth-mysql php5-mysql
+    sudo apt-get install -y mysql-server libapache2-mod-auth-mysql php7.0-mysql
     sudo mysql_install_db
     sudo /usr/bin/mysql_secure_installation
 
-    sudo apt-get install -y php5 libapache2-mod-php5 php5-mcrypt
-    sudo apt-get install -y php5-mysql php5-sqlite php5-common php5-dev
+    sudo apt-get install -y php7.0 libapache2-mod-php7.0 php7.0-mcrypt
+    sudo apt-get install -y php7.0-mysql php7.0-sqlite php7.0-common php7.0-dev
 
     sudo service apache2 restart
     ;;
@@ -263,7 +263,7 @@ case "$1" in
     echo '    update    Update installed packages'
     echo '    base      Install basic packages'
     echo '    gdb       Install pwndbg'
-    echo '    apache    Install apache, mysql, php5'
+    echo '    apache    Install apache, mysql, php7.0'
     echo '    ftp       Install vsftpd with self-signed certificate'
     echo '    github    Install github account'
     echo '    link      Install symbolic links'

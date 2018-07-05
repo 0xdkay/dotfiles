@@ -16,6 +16,7 @@ function git_clone() {
     echo "Cloning '$1'..."
     git clone "$1" "$HOME/$2"
   else
+    # shellcheck disable=SC2088
     echoerr "~/$2 already exists."
   fi
 }
@@ -197,7 +198,7 @@ case "$1" in
     do
       replace_file "$FILENAME"
     done
-
+    replace_file 'pip.conf' '.pip/pip.conf'
     replace_file 'tpm' '.tmux/plugins/tpm'
     for FILENAME in \
       'diff-highlight' \
@@ -211,14 +212,15 @@ case "$1" in
     curl -sL https://git.io/antibody | bash -s
     ;;
   brew)
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     ;;
 
   formulae)
-    while read COMMAND; do
+    while read -r COMMAND; do
       trap 'break' INT
       [[ -z "$COMMAND" || ${COMMAND:0:1} == '#' ]] && continue
-      brew $COMMAND
+      IFS=' ' read -ra BREW_ARGS <<< "$COMMAND"
+      brew "${BREW_ARGS[@]}"
     done < "$DIR/Brewfile" && echo 'Done.'
     ;;
 
@@ -243,17 +245,17 @@ case "$1" in
     ;;
 
   pyenv)
-    curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+    curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     ;;
 
   rbenv)
-    git_clone https://github.com/sstephenson/rbenv.git .rbenv
-    git_clone https://github.com/sstephenson/ruby-build.git .rbenv/plugins/ruby-build
+    git_clone https://github.com/rbenv/rbenv.git .rbenv
+    git_clone https://github.com/rbenv/ruby-build.git .rbenv/plugins/ruby-build
     echo 'Done.'
     ;;
 
   rvm)
-    \curl -sSL https://get.rvm.io | bash -s stable
+    command curl -sSL https://get.rvm.io | bash -s stable
     ;;
 
   *)

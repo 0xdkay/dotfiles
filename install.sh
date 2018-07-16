@@ -76,7 +76,7 @@ case "$1" in
 
     if [ "$(uname)" != "Darwin" ] && [ -e "$HOME/.gdb/pwndbg" ]; then
       # pwngdb update
-      cd ~/.gdb/pwndbg/
+      cd $HOME/.gdb/pwndbg/
       git pull origin master
       ./setup.sh
 
@@ -106,7 +106,7 @@ case "$1" in
       # install gdb
       sudo apt-get install -y gdb
       git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-      cd ~/.gdb/pwndbg
+      cd $HOME/.gdb/pwndbg
       ./setup.sh
 
       else
@@ -116,7 +116,7 @@ case "$1" in
       if [[ ! -e "$HOME/.gdb/pwndbg" ]]; then
       brew install gdb
       git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-      cd ~/.gdb/pwndbg
+      cd $HOME/.gdb/pwndbg
       ./setup.sh
       else
         echo "already exists"
@@ -167,9 +167,9 @@ case "$1" in
     read GITHUB_ACCOUNT
     ssh-keygen -t rsa -C $GITHUB_ACCOUNT
     eval $(ssh-agent)
-    ssh-add ~/.ssh/id_rsa
+    ssh-add $HOME/.ssh/id_rsa
     echo "need to add below public key to github"
-    cat ~/.ssh/id_rsa.pub
+    cat $HOME/.ssh/id_rsa.pub
     echo -n "press enter when you done..."
     read t
     ssh -T git@github.com
@@ -213,7 +213,7 @@ case "$1" in
     sudo apt-get install -y build-essential cmake
     sudo apt-get install -y python-dev python3-dev
 
-    cd ~/.vim/plugged/YouCompleteMe
+    cd $HOME/.vim/plugged/YouCompleteMe
     ./install.py --clang-completer
     ;;
 
@@ -269,19 +269,20 @@ case "$1" in
     ;;
 
   conda)
-    if [ ! -f ~/Anaconda3-5.2.0-Linux-x86_64.sh ]; then
-      wget https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh -O ~/
-      chmod +x ~/Anaconda3-5.2.0-Linux-x86_64.sh
+    if [ ! -f "$HOME/Anaconda3-5.2.0-Linux-x86_64.sh" ]; then
+      wget "https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh" \
+        -O "$HOME/Anaconda3-5.2.0-Linux-x86_64.sh"
+      chmod +x "$HOME/Anaconda3-5.2.0-Linux-x86_64.sh"
     fi
-    bash ~/Anaconda3-5.2.0-Linux-x86_64.sh
+    bash "$HOME/Anaconda3-5.2.0-Linux-x86_64.sh"
     ;;
 
   conda2)
-    if [ ! -f ~/Anaconda2-5.2.0-Linux-x86_64.sh ]; then
-      wget https://repo.anaconda.com/archive/Anaconda2-5.2.0-Linux-x86_64.sh -O ~/
-      chmod +x ~/Anaconda2-5.2.0-Linux-x86_64.sh
+    if [ ! -f $HOME/Anaconda2-5.2.0-Linux-x86_64.sh ]; then
+      wget https://repo.anaconda.com/archive/Anaconda2-5.2.0-Linux-x86_64.sh -O $HOME/
+      chmod +x $HOME/Anaconda2-5.2.0-Linux-x86_64.sh
     fi
-    bash ~/Anaconda2-5.2.0-Linux-x86_64.sh
+    bash $HOME/Anaconda2-5.2.0-Linux-x86_64.sh
     ;;
 
   *)

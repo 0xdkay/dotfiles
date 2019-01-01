@@ -231,6 +231,8 @@ Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
 Plug 'elzr/vim-json', { 'for': ['json', 'markdown'] }
 " LaTeX
 Plug 'lervag/vimtex', { 'for': ['bib', 'tex'] }
+" LangTool
+Plug 'rhysd/vim-grammarous', { 'for' : ['tex'] }
 " Markdown
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -757,6 +759,15 @@ augroup vimrc
         \ if !filereadable('Makefile') && !filereadable('makefile') |
         \   setlocal makeprg=g++\ -o\ %< |
         \ endif
+
+  " Tex, grammarrous
+  autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
+  autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
+  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
+  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
+  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
+  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
+  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
 
   " Markdown code snippets
   autocmd FileType markdown inoremap <buffer> <LocalLeader>` ```
@@ -1307,7 +1318,7 @@ if has('mac') || has('macunix')
   nnoremap <Leader>d <Plug>DashSearch
 endif
 
+
 " }}}
 " =============================================================================
 
-let g:languagetool_jar = '/home/dongkwan/tools/LanguageTool-3.3/languagetool-commandline.jar'

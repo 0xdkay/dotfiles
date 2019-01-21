@@ -255,6 +255,12 @@ Plug 'sheerun/vim-polyglot'
 " A nicer Python indentation style for vim
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 
+" FSharp (F#)
+Plug 'fsharp/vim-fsharp', {
+      \ 'for': 'fsharp',
+      \ 'do':  'make fsautocomplete',
+      \}
+
 " Ruby
 "" Rake
 "Plug 'tpope/vim-rake'
@@ -548,9 +554,9 @@ set expandtab
 " Insert only one space after a '.', '?' and '!' with a join command
 set nojoinspaces
 " Number of spaces that a <Tab> counts for while editing
-set softtabstop=2
+set softtabstop=4
 " Number of spaces to use for each setp of (auto)indent
-set shiftwidth=2
+set shiftwidth=4
 " Number of spaces that a <Tab> in the file counts for
 set tabstop=8
 " Maximum width of text that is being inserted
@@ -763,11 +769,11 @@ augroup vimrc
   " Tex, grammarrous
   autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
   autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
-  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
-  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
-  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
-  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
-  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
+"  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
+"  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
+"  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
+"  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
+"  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
 
   " Markdown code snippets
   autocmd FileType markdown inoremap <buffer> <LocalLeader>` ```
@@ -934,6 +940,10 @@ endif
 
 " Syntastic
 if has_key(g:plugs, 'syntastic')
+  set statusline+=%#warningmsg#
+  set statusline+=%{SyntasticStatuslineFlag()}
+  set statusline+=%*
+
   " Skip checks when you issue :wq, :x and :ZZ
   let g:syntastic_check_on_wq = 0
   " Display all of the errors from all of the checkers together
@@ -955,6 +965,10 @@ if has_key(g:plugs, 'syntastic')
         \ --bitwise --newcap --sloppy --vars --maxerr=1000'
   " Enable Vint for Vim files
   let g:syntastic_javascript_checkers = ['vimlint', 'vint']
+
+  " additional options to support vim-fsharp
+  let g:syntastic_check_on_open = 1
+  let g:syntastic_auto_loc_list = 1
 endif
 
 " vim-shell

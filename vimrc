@@ -231,6 +231,8 @@ Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
 Plug 'elzr/vim-json', { 'for': ['json', 'markdown'] }
 " LaTeX
 Plug 'lervag/vimtex', { 'for': ['bib', 'tex'] }
+" LangTool
+Plug 'rhysd/vim-grammarous', { 'for' : ['tex'] }
 " Markdown
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -252,6 +254,12 @@ Plug 'sheerun/vim-polyglot'
 " Python
 " A nicer Python indentation style for vim
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
+
+" FSharp (F#)
+Plug 'fsharp/vim-fsharp', {
+      \ 'for': 'fsharp',
+      \ 'do':  'make fsautocomplete',
+      \}
 
 " Ruby
 "" Rake
@@ -546,9 +554,9 @@ set expandtab
 " Insert only one space after a '.', '?' and '!' with a join command
 set nojoinspaces
 " Number of spaces that a <Tab> counts for while editing
-set softtabstop=2
+set softtabstop=4
 " Number of spaces to use for each setp of (auto)indent
-set shiftwidth=2
+set shiftwidth=4
 " Number of spaces that a <Tab> in the file counts for
 set tabstop=8
 " Maximum width of text that is being inserted
@@ -758,6 +766,15 @@ augroup vimrc
         \   setlocal makeprg=g++\ -o\ %< |
         \ endif
 
+  " Tex, grammarrous
+  autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
+  autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
+"  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
+"  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
+"  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
+"  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
+"  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
+
   " Markdown code snippets
   autocmd FileType markdown inoremap <buffer> <LocalLeader>` ```
 
@@ -923,6 +940,10 @@ endif
 
 " Syntastic
 if has_key(g:plugs, 'syntastic')
+  set statusline+=%#warningmsg#
+  set statusline+=%{SyntasticStatuslineFlag()}
+  set statusline+=%*
+
   " Skip checks when you issue :wq, :x and :ZZ
   let g:syntastic_check_on_wq = 0
   " Display all of the errors from all of the checkers together
@@ -944,6 +965,10 @@ if has_key(g:plugs, 'syntastic')
         \ --bitwise --newcap --sloppy --vars --maxerr=1000'
   " Enable Vint for Vim files
   let g:syntastic_javascript_checkers = ['vimlint', 'vint']
+
+  " additional options to support vim-fsharp
+  let g:syntastic_check_on_open = 1
+  let g:syntastic_auto_loc_list = 1
 endif
 
 " vim-shell
@@ -1308,7 +1333,7 @@ if has('mac') || has('macunix')
   nnoremap <Leader>d <Plug>DashSearch
 endif
 
+
 " }}}
 " =============================================================================
 
-let g:languagetool_jar = '/home/dongkwan/tools/LanguageTool-3.3/languagetool-commandline.jar'

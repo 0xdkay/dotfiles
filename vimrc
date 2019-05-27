@@ -767,13 +767,30 @@ augroup vimrc
         \ endif
 
   " Tex, grammarrous
-  autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
-  autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
+"  autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
+"  autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
 "  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
 "  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
 "  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
 "  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
 "  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
+
+    let g:grammarous#hooks = {}
+    function! g:grammarous#hooks.on_check(errs) abort
+        nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
+        nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
+        nmap <buffer><C-f> <Plug>(grammarous-fixit)
+        nmap <buffer><C-r> <Plug>(grammarous-remove-error)
+        nmap <buffer><C-x> <Plug>(grammarous-reset)
+    endfunction
+
+    function! g:grammarous#hooks.on_reset(errs) abort
+        nunmap <buffer><C-n>
+        nunmap <buffer><C-p>
+        nunmap <buffer><C-f>
+        nunmap <buffer><C-r>
+        nunmap <buffer><C-x>
+    endfunction
 
   " Markdown code snippets
   autocmd FileType markdown inoremap <buffer> <LocalLeader>` ```

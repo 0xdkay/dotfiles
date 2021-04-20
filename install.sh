@@ -97,6 +97,7 @@ install_link() {
     'git-templates' \
     'gitattributes_global' \
     'gitconfig' \
+    'gitconfig.user' \
     'gitignore_global' \
     'ideavimrc' \
     'inputrc' \

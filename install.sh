@@ -148,15 +148,6 @@ case "$1" in
 
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
-
-    if [ "$(uname)" != "Darwin" ] && [ -e "$HOME/.gdb/pwndbg" ]; then
-      # pwngdb update
-      cd $HOME/.gdb/pwndbg/
-      git pull origin master
-      ./setup.sh
-
-      sudo apt-get autoremove -y
-    fi
     ;;
 
   base)
@@ -170,70 +161,9 @@ case "$1" in
     sudo apt-get -y dist-upgrade
 
     # install softwares
-    sudo apt-get install -y vim zsh tmux
-    sudo apt-get install build-essential python-dev python-pip
+    sudo apt-get install -y vim zsh tmux git
+    #sudo apt-get install build-essential python-dev python-pip
     # sudo apt-get install -y exuberant-ctags
-    ;;
-
-  gdb)
-    if [[ "$(uname)" != 'Darwin' ]]; then
-      if [[ ! -e "$HOME/.gdb/pwndbg" ]]; then
-      # install gdb
-      sudo apt-get install -y gdb
-      git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-      cd $HOME/.gdb/pwndbg
-      ./setup.sh
-
-      else
-        echo "already exists"
-      fi
-    else
-      if [[ ! -e "$HOME/.gdb/pwndbg" ]]; then
-      brew install gdb
-      git_clone https://github.com/zachriggle/pwndbg .gdb/pwndbg
-      cd $HOME/.gdb/pwndbg
-      ./setup.sh
-      else
-        echo "already exists"
-      fi
-    fi
-    ;;
-
-  apache)
-    # install apache, mysql, php
-    sudo apt-get install -y apache2
-    echo "apache is running on ....."
-    ifconfig eth0 | grep inet | awk '{ print $2 }'
-
-    sudo apt-get install -y mysql-server libapache2-mod-auth-mysql php7.0-mysql
-    sudo mysql_install_db
-    sudo /usr/bin/mysql_secure_installation
-
-    sudo apt-get install -y php7.0 libapache2-mod-php7.0 php7.0-mcrypt
-    sudo apt-get install -y php7.0-mysql php7.0-sqlite php7.0-common php7.0-dev
-
-    sudo service apache2 restart
-    ;;
-
-  ftp)
-    # install vsftpd with ftps
-    sudo apt-get install -y vsftpd
-    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
-    sudo sed -i 's/\anonymous_enable=.*/anonymous_enable=NO/g' /etc/vsftpd.conf
-    sudo sed -i 's/\#local_enable=.*/local_enable=YES/g' /etc/vsftpd.conf
-    sudo sed -i 's/\#write_enable=.*/write_enable=YES/g' /etc/vsftpd.conf
-    sudo sed -i 's/rsa_cert_file.*/rsa_cert_file=\/etc\/ssl\/private\/vsftpd.pem/g' /etc/vsftpd.conf
-    sudo sed -i 's/rsa_private_key_file.*/rsa_private_key_file=\/etc\/ssl\/private\/vsftpd.pem/g' /etc/vsftpd.conf
-    echo "ssl_enable=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "allow_anon_ssl=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "force_local_data_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "force_local_logins_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "ssl_tlsv1=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "ssl_sslv2=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "ssl_sslv3=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "require_ssl_reuse=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    echo "ssl_ciphers=HIGH" | sudo tee -a /etc/vsftpd.conf > /dev/null
-    sudo service vsftpd restart
     ;;
 
   github)
@@ -328,16 +258,20 @@ case "$1" in
     echo "usage: $(basename "$0") <command>"
     echo ''
     echo 'Available commands:'
-    echo '    link         Install symbolic links'
-    echo '    brew         Install Homebrew on macOS (or Linux)'
-    echo '    chruby       Install chruby'
-    echo '    formulae     Install Homebrew formulae using Brewfile'
-    echo '    pwndbg       Install pwndbg'
-    echo '    pyenv        Install pyenv with pyenv-virtualenv'
-    echo '    rbenv        Install rbenv'
-    echo '    ruby-install Install ruby-install'
-    echo '    rustup       Install rustup'
-    echo '    rvm          Install RVM'
-    echo '    weechat      Install WeeChat configuration'
+    echo '    update        Update installed packages'
+    echo '    base          Install basic packages'
+    echo '    link          Install symbolic links'
+    echo '    antibody      Install Antibody'
+    echo '    pwndbg        Install pwndbg'
+    echo '    github        Install github account'
+    echo '    brew          Install Homebrew on macOS (or Linux)'
+    echo '    formulae      Install Homebrew formulae using Brewfile'
+    echo '    pyenv         Install pyenv with pyenv-virtualenv'
+    echo '    rustup        Install rustup'
+    echo '    ruby-install  Install ruby-install'
+    echo '    chruby        Install chruby'
+    echo '    rbenv         Install rbenv'
+    echo '    rvm           Install RVM'
+    echo '    weechat       Install WeeChat configuration'
     ;;
 esac

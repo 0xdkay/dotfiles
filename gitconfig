@@ -1,5 +1,6 @@
 [core]
 	attributesFile = ~/.gitattributes_global
+	autocrlf = false
 	excludesFile = ~/.gitignore_global
 	editor = vim
 	pager = less -F -R -X
@@ -7,9 +8,14 @@
 	quotePath = false
 [color]
 	ui = auto
+[commit]
+	verbose = true
 [diff]
+	colorMoved = true
 	compactionHeuristic = true
 	renames = true
+	submodule = log
+	wsErrorHighlight = old,new
 [diff "utf-16"]
 	textconv = iconv -f utf-16 -t utf-8
 [difftool]
@@ -17,11 +23,13 @@
 [fetch]
 	prune = true
 [filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
 	required = true
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
-[include]
-	path = ~/.gitconfig.local
+[init]
+	defaultBranch = main
+	templateDir = ~/.git-templates
 [interactive]
 	diffFilter = diff-highlight
 [log]
@@ -30,11 +38,26 @@
 	diff = diff-highlight | $(git config core.pager)
 	log = diff-highlight | $(git config core.pager)
 	show = diff-highlight | $(git config core.pager)
+[pull]
+	ff = only
 [push]
 	default = simple
+[rebase]
+	autoStash = true
+	autoSquash = true
+[rerere]
+	enabled = true
+[sendemail]
+	confirm = always
+	suppresscc = self
+[stash]
+	showPatch = true
+[status]
+	showStash = true
 [submodule]
 	fetchJobs = 0
 [user]
-	email = 0xdkay@gmail.com
-	name = Dongkwan Kim
 	useConfigOnly = true
+[include]
+	path = ~/.gitconfig.user
+	path = ~/.gitconfig.local

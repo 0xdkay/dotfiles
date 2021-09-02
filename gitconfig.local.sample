@@ -1,6 +1,0 @@
-[commit]
-	gpgsign = true
-[user]
-	name = Chayoung You
-	email = yousbe@gmail.com
-	signingKey = 1D5A400A

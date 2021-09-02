@@ -1,6 +1,7 @@
-[submodule "tomorrow-theme"]
-	path = tomorrow-theme
-	url = https://github.com/chriskempson/tomorrow-theme.git
+[submodule "pwndbg"]
+	path = pwndbg
+	url = https://github.com/pwndbg/pwndbg.git
+	branch = stable
 [submodule "tpm"]
 	path = tpm
 	url = https://github.com/tmux-plugins/tpm.git

@@ -1,0 +1,196 @@
+# APT
+aptup() {
+  sudo apt update
+  for lock in '/var/lib/dpkg/lock-frontend' '/var/lib/dpkg/lock'; do
+    if [ -e "$lock" ]; then
+      ch='-'
+      locked=''
+      while sudo fuser "$lock" >/dev/null 2>&1; do
+        locked='y'
+        case "$ch" in
+          -) ch=\\ ;;
+          \\) ch='|' ;;
+          \|) ch='/' ;;
+          /) ch='-' ;;
+        esac
+        printf "%b" "\r[$ch] Waiting for $lock..."
+        sleep 0.5
+      done
+      [ "$locked" = 'y' ] && echo
+      unset ch locked
+    fi
+  done
+  sudo apt -y upgrade
+}
+
+# Bundler
+bundle_install() {
+  local cores_num
+  if [ "$(uname)" = 'Darwin' ]; then
+    cores_num="$(sysctl -n hw.ncpu)"
+  else
+    cores_num="$(nproc)"
+  fi
+  bundle install --jobs="$cores_num" "$@"
+}
+
+# Number conversion
+hex() {
+  if [ "$#" -ne 1 ]; then
+    echo "Usage: hex <num>"
+  fi
+
+  local num
+  case "$1" in
+    0x*)
+      num="$((16#${1#0x}))"
+      ;;
+    0*)
+      num="$((8#${1#0}))"
+      ;;
+    b*)
+      num="$((2#${1#b}))"
+      ;;
+    *)
+      num="$1"
+      ;;
+  esac
+  echo "Hex: $(echo "obase=16; $num" | bc)"
+  echo "Dec: $(echo "obase=10; $num" | bc)"
+  echo "Bin: $(echo "obase=2; $num" | bc)"
+  # [:print:]
+  if [ "$num" -ge "32" ] && [ "$num" -le "126" ]; then
+    echo "Chr: $(printf '\\x%02x' "$num")"
+  fi
+}
+
+# http://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
+man() {
+  env \
+    LESS_TERMCAP_mb="$(printf "\e[1;31m")" \
+    LESS_TERMCAP_md="$(printf "\e[1;31m")" \
+    LESS_TERMCAP_me="$(printf "\e[0m")" \
+    LESS_TERMCAP_se="$(printf "\e[0m")" \
+    LESS_TERMCAP_so="$(printf "\e[1;44;33m")" \
+    LESS_TERMCAP_ue="$(printf "\e[0m")" \
+    LESS_TERMCAP_us="$(printf "\e[1;32m")" \
+    man "$@"
+}
+
+# Check if reboot is required for Ubuntu
+if [ -f /usr/lib/update-notifier/update-motd-reboot-required ]; then
+  reboot-required() {
+    /usr/lib/update-notifier/update-motd-reboot-required
+  }
+fi
+
+# Enable color support
+if ls --color -d . >/dev/null 2>&1; then
+  alias ls='ls --color=auto'
+else
+  alias ls='ls -G'
+fi
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# Some more basic aliases
+# alias ll='ls -alF'
+# alias la='ls -A'
+# alias l='ls -CF'
+alias ll='ls -lh'
+alias la='ls -lAh'
+alias l='ls -lah'
+alias md='mkdir -p'
+alias rd='rmdir'
+
+# Homebrew
+alias brup='brew upgrade && brew cleanup'
+
+# Bundler
+alias be='bundle exec'
+alias bi='bundle_install'
+alias bu='bundle update'
+
+# Git
+if [ -n "$ZSH_VERSION" ]; then
+  alias git='noglob git'
+fi
+alias g='git'
+alias ga='git add'
+alias gap='git add --patch'
+alias gb='git branch'
+alias gba='git branch --all'
+alias gbl='git blame'
+alias gbv='git branch -vv'
+alias gc='git commit'
+alias gc!='git commit --amend'
+alias gca='git commit --all'
+alias gca!='git commit --all --amend'
+alias gcb='git checkout -b'
+alias gcd='git checkout develop'
+alias gcl='git clone --recurse-submodules'
+alias gcm='git checkout master'
+alias gco='git checkout'
+alias gcop='git checkout --patch'
+alias gcp='git cherry-pick'
+alias gd='git diff'
+alias gdc='git diff --cached'
+alias gf='git fetch'
+alias gfl='git-flow'
+alias ggp='git push origin HEAD'
+alias gl='git pull'
+alias glg='git log --decorate --graph --pretty=format:"%C(auto,yellow)%h %C(auto,blue)%ar %C(auto,green)%an%C(auto,reset) %s%C(auto)%d"'
+alias glga='glg --all'
+alias glr='git pull --rebase'
+alias gm='git merge'
+alias gma='git merge --abort'
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+gpr() {
+  git fetch "${2:-$(git remote | grep ^upstream || echo origin)}" "refs/pull/$1/head:pr/$1"
+  git checkout "pr/$1"
+}
+alias gr='git remote'
+alias gra='git remote add'
+alias grb='git rebase'
+alias grba='git rebase --abort'
+alias grbc='git rebase --continue'
+alias grbi='git rebase --interactive'
+alias grr='git remote remove'
+alias grs='git reset'
+alias grsp='git reset --patch'
+alias grup='git remote update'
+alias grt='git restore'
+alias grtp='git restore --patch'
+alias grv='git remote --verbose'
+alias gsb='git submodule'
+alias gsh='git show'
+alias gst='git status'
+alias gsta='git stash'
+alias gstap='git stash --patch'
+alias gstd='git stash drop'
+alias gstp='git stash pop'
+alias gsu='git submodule update'
+alias gsur='git submodule update --remote'
+alias gsc='git switch --create'
+alias gsd='git switch develop'
+alias gsm='git switch master'
+alias gsw='git switch'
+alias gswd='git switch --detach'
+
+# Vim
+if command -v vim >/dev/null; then
+  alias v='vim'
+  alias vi='vim'
+elif command -v vi >/dev/null; then
+  alias v='vi'
+fi
+if command -v nvim >/dev/null; then
+  alias nv='nvim'
+fi
+
+# Zinit
+if [ -n "$ZSH_VERSION" ]; then
+  alias ziup='zinit self-update && zinit update --all'
+fi

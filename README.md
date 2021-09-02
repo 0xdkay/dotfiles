@@ -1,25 +1,32 @@
 # dotfiles
 
-[![Build Status](https://travis-ci.org/yous/dotfiles.svg?branch=master)](https://travis-ci.org/yous/dotfiles)
+[![Build Status](https://github.com/yous/dotfiles/workflows/CI/badge.svg?branch=master)](https://github.com/yous/dotfiles/actions?query=branch%3Amaster)
 
 [@yous](https://github.com/yous)' dotfiles.
 
+## Table of Contents
+
 - [Requirements](#requirements)
-- [Install](#install)
-    - [Git](#git)
-    - [Homebrew](#homebrew)
-    - [Ruby](#ruby)
-    - [Python](#python)
-    - [Zsh](#zsh)
-    - [Vim](#vim)
-    - [IntelliJ, Android Studio](#intellij-android-studio)
-    - [iTerm2](#iterm2)
+- [Installation](#installation)
+  - [Git](#git)
+  - [Homebrew](#homebrew)
+  - [Ruby](#ruby)
+  - [Rust](#rust)
+  - [Python](#python)
+  - [Zsh](#zsh)
+  - [Vim](#vim)
+  - [Neovim](#neovim)
+  - [WeeChat](#weechat)
+  - [Tools](#tools)
+  - [IntelliJ, Android Studio](#intellij-android-studio)
+  - [iTerm2](#iterm2)
+- [License](#license)
 
 ## Requirements
 
 - [Git](http://git-scm.com)
 
-## Install
+## Installation
 
 Clone this repository:
 
@@ -34,22 +41,25 @@ For available install options:
 ./install.sh
 ```
 
-Command option | Description
----------------|-----------------------------------------------
-`link`         | Install symbolic links
-`antibody`     | Install Antibody
-`brew`         | Install Homebrew
-`formulae`     | Install Homebrew formulae using Brewfile
-`npm`          | Install global Node.js packages
-`pyenv`        | Install pyenv with pyenv-virtualenv
-`rbenv`        | Install rbenv
-`rvm`          | Install RVM
+| Command option | Description                              |
+|----------------|------------------------------------------|
+| `link`         | Install symbolic links                   |
+| `brew`         | Install Homebrew on macOS (or Linux)     |
+| `chruby`       | Install chruby                           |
+| `formulae`     | Install Homebrew formulae using Brewfile |
+| `pwndbg`       | Install pwndbg                           |
+| `pyenv`        | Install pyenv with pyenv-virtualenv      |
+| `rbenv`        | Install rbenv                            |
+| `ruby-install` | Install ruby-install                     |
+| `rustup`       | Install rustup                           |
+| `rvm`          | Install RVM                              |
+| `weechat`      | Install WeeChat configuration            |
 
 In Windows, use `install.bat`. It links files into the user's home directory.
 
 ### Git
 
-Set user-specific configurations on `~/.gitconfig.local`:
+Set user-specific configurations on `~/.gitconfig.user`:
 
 ``` gitconfig
 [user]
@@ -74,6 +84,29 @@ You can also sign your each commit automatically:
 For more information about signing commits, see
 [A Git Horror Story: Repository Integrity With Signed Commits](http://mikegerwitz.com/papers/git-horror-story).
 
+If you want to use Gmail for `git send-email`,
+
+``` gitconfig
+[sendemail]
+	smtpEncryption = tls
+	smtpServer = smtp.gmail.com
+	smtpServerPort = 587
+	smtpUser = you@gmail.com
+```
+
+For more information, see [the documentation](https://git-scm.com/docs/git-send-email)
+for git-send-email.
+
+Set local-specific configurations on `~/.gitconfig.local`:
+
+``` gitconfig
+[includeIf "gitdir:~/to/group/"]
+	path = /path/to/foo.inc
+```
+
+For more information, see [conditional includes](https://git-scm.com/docs/git-config#_conditional_includes)
+section in the git-config documentation.
+
 If you want to use latest release of Git for Ubuntu:
 
 ``` sh
@@ -86,7 +119,7 @@ for more information.
 
 ### Homebrew
 
-If you want to install [Homebrew](http://brew.sh),
+If you want to install [Homebrew](http://brew.sh) or [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux),
 
 ``` sh
 ./install.sh brew
@@ -95,7 +128,6 @@ If you want to install [Homebrew](http://brew.sh),
 Then install Homebrew formulae with:
 
 ``` sh
-rvm use system # To compile Vim with Ruby support
 ./install.sh formulae
 ```
 
@@ -104,7 +136,7 @@ rvm use system # To compile Vim with Ruby support
 #### chruby
 
 If you want to install [chruby](https://github.com/postmodern/chruby), if you're
-on OS X,
+on macOS,
 
 ``` sh
 brew install ruby-install
@@ -121,19 +153,13 @@ yaourt -S ruby-install
 Otherwise,
 
 ``` sh
-wget -O ruby-install-0.6.1.tar.gz https://github.com/postmodern/ruby-install/archive/v0.6.1.tar.gz
-tar -xzvf ruby-install-0.6.1.tar.gz
-cd ruby-install-0.6.1/
-sudo make install
+./install.sh ruby-install
 ```
 
 Then install chruby,
 
 ``` sh
-wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
-tar -xzvf chruby-0.3.9.tar.gz
-cd chruby-0.3.9/
-sudo make install
+./install.sh chruby
 ```
 
 #### RVM
@@ -152,14 +178,7 @@ rvm get stable
 
 #### rbenv
 
-If you want to install [rbenv](https://github.com/sstephenson/rbenv), if you're
-on OS X,
-
-``` sh
-brew install rbenv
-```
-
-Otherwise,
+If you want to install [rbenv](https://github.com/sstephenson/rbenv),
 
 ``` sh
 ./install.sh rbenv
@@ -172,27 +191,28 @@ If you are using RVM,
 ``` sh
 gem update --system
 rvm use current@global
-gem install bundler rubocop ruby-lint wirble
+gem install rubocop webrick
 ```
 
 Otherwise just install gems:
 
 ``` sh
 gem update --system
-gem install bundler rubocop ruby-lint wirble
+gem install rubocop webrick
+```
+
+### Rust
+
+If you want to install [rustup](https://rustup.rs),
+
+``` sh
+./install.sh rustup
 ```
 
 ### Python
 
-If you want to install [pyenv](https://github.com/yyuu/pyenv) and
-[pyenv-virtualenv](https://github.com/yyuu/pyenv-virtualenv), if you're on OS X,
-
-``` sh
-brew install pyenv
-brew install pyenv-virtualenv
-```
-
-Otherwise,
+If you want to install [pyenv](https://github.com/pyenv/pyenv) and
+[pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv),
 
 ``` sh
 ./install.sh pyenv
@@ -216,7 +236,13 @@ chsh -s /usr/local/bin/zsh
 To update Zsh plugins:
 
 ``` sh
-antibody update
+zinit update --all
+```
+
+To update [Zinit](https://github.com/zdharma/zinit) itself:
+
+``` sh
+zinit self-update
 ```
 
 To make RVM works with Vim on OS X Yosemite or earlier, move `/etc/zshenv` to
@@ -251,8 +277,8 @@ To install [Vim](http://www.vim.org) plugins,
 ```
 
 You should install [Exuberant Ctags](http://ctags.sourceforge.net/) to use
-[vim-easytags](https://github.com/xolox/vim-easytags). You should install CMake
-to use [YouCompleteMe](https://github.com/Valloric/YouCompleteMe).
+[vim-gutentags](https://github.com/ludovicchabant/vim-gutentags). You should
+install Node.js to use [coc.nvim](https://github.com/neoclide/coc.nvim).
 
 To update Vim plugins:
 
@@ -266,32 +292,108 @@ To update [vim-plug](https://github.com/junegunn/vim-plug):
 :PlugUpgrade
 ```
 
-For additional syntax checkers for [Syntastic](https://github.com/scrooloose/syntastic):
+For additional syntax checkers for coc.nvim, [ALE](https://github.com/dense-analysis/ale),
+or [Syntastic](https://github.com/vim-syntastic/syntastic):
 
-- CSS (CSSLint): `./install npm`
-- HTML (JSHint): `./install npm`
-- JavaScript (JSHint, JSLint): `./install npm`
-- JSON (JSONLint): `./install npm`
-- Ruby (RuboCop, ruby-lint): `gem install rubocop ruby-lint`
-- SASS: `gem install sass`
-- SCSS: `gem install sass scss-lint`
-- xHTML (JSHint): `./install npm`
+- C, C++
+  - clang-check: `brew install llvm`
+  - clang-tidy: `brew install llvm`
+  - cppcheck: `brew install cppcheck`
+- CSS
+  - stylelint: `npm install -g stylelint stylelint-config-standard`
+- JavaScript
+  - ESLint: `npm install -g eslint`
+- JSON
+  - JSONLint: `npm install -g jsonlint`
+- Python
+  - flake8: `pip install flake8`
+  - jedi: `pip install jedi`
+- Ruby
+  - RuboCop: `gem install rubocop`
+- SASS, SCSS
+  - stylelint: `npm install -g stylelint stylelint-config-sass-guidelines`
+
+### Neovim
+
+To use Python 2 or 3 via pyenv in [Neovim](https://neovim.io),
+
+``` sh
+pyenv install 2.7.18
+pyenv virtualenv 2.7.18 neovim2
+pyenv activate neovim2
+pip install pynvim
+
+pyenv install 3.8.2
+pyenv virtualenv 3.8.2 neovim3
+pyenv activate neovim3
+pip install pynvim
+```
+
+To use Ruby in Neovim,
+
+``` sh
+gem install neovim
+```
+
+To use Node.js in Neovim,
+
+``` sh
+npm install -g neovim
+```
+
+### WeeChat
+
+To install [WeeChat](https://weechat.org) configuration,
+
+``` sh
+./install.sh weechat
+```
+
+Then install scripts:
+
+```
+/script install autosort.py buffers.pl colorize_nicks.py iset.pl
+```
+
+To update WeeChat scripts:
+
+```
+/script update
+/script upgrade
+```
+
+### Tools
+
+#### pwndbg
+
+If you want to install [pwndbg](https://github.com/pwndbg/pwndbg),
+
+``` sh
+./install.sh pwndbg
+```
 
 ### IntelliJ, Android Studio
 
-To use [Tomorrow Theme](https://github.com/ChrisKempson/Tomorrow-Theme):
+To use Tomorrow Theme:
 
-1. Open File > Import Settings… in [IntelliJ](http://www.jetbrains.com/idea/) or
-   [Android Studio](http://developer.android.com/sdk/installing/studio.html).
-2. Select `tomorrow-theme/JetBrains/settings.jar`.
-3. Open Settings > Editor > Colors & Fonts.
-4. Select a scheme of Tomorrow Theme.
+1. Download `JetBrains/settings.jar` from [chriskempson/tomorrow-theme](https://github.com/chriskempson/tomorrow-theme).
+2. Open File > Import Settings… in [IntelliJ](https://www.jetbrains.com/idea/) or
+   [Android Studio](https://developer.android.com/studio).
+3. Select downloaded `settings.jar`.
+4. Open Settings > Editor > Colors Scheme.
+5. Select one of Tomorrow Theme.
 
 ### iTerm2
 
-To use [Tomorrow Theme](https://github.com/ChrisKempson/Tomorrow-Theme):
+To use Tomorrow Theme:
 
-1. Open Preferences… > Profiles > Colors.
-2. Click 'Load Presets…' and select 'Import…'.
-3. Select `*.itermcolors` files under `tomorrow-theme/iTerm2/`.
-4. Click 'Load Presets…' again and select one of Tomorrow Theme.
+1. Download `schemes/Tomorrow*.itermcolors` from
+   [mbadolato/iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
+2. Open Preferences… > Profiles > Colors.
+3. Click 'Load Presets…' and select 'Import…'.
+4. Select downloaded `Tomorrow*.itermcolors`.
+5. Click 'Load Presets…' again and select one of Tomorrow Theme.
+
+## License
+
+Copyright © Chayoung You. See [LICENSE.txt](LICENSE.txt) for details.

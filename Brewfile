@@ -1,32 +1,45 @@
-# Mac OS X
-install reattach-to-user-namespace
+if OS.mac?
+  # macOS
+  brew "reattach-to-user-namespace"
 
-# Tools
-install git
-install grep --with-default-names
-install ripgrep
-install openssh
-install wget
-install autojump
-install zsh
-install tmux
-install cmake
-install ctags
-install cscope
-install keychain
+  # Basic tools
+  brew "cmake"
+  brew "cscope"
+  brew "ctags"
+  brew "git"
+  brew "openssh"
+  brew "tmux"
+  brew "wget"
+  brew "zsh"
+
+  # QLColorCode
+  brew "highlight" if MacOS.version < :catalina
+end
+
+# Utilities
+brew "bat"
+brew "fd"
+brew "htop"
+brew "keychain" if OS.mac?
+brew "pre-commit"
+brew "ripgrep"
+brew "tig"
+brew "z"
 
 # Python
-install python
-install pyenv
-install pyenv-virtualenv
+brew "python"
+brew "pyenv"
+brew "pyenv-virtualenv"
 
 # Ruby
-install ruby-install
-install chruby
+brew "ruby"
+brew "chruby"
+
+# Node.js
+brew "node"
 
 # Vim
-install vim
+brew "vim"
 
-# Antibody
-tap getantibody/homebrew-antibody
-install antibody
+# Krypton
+brew "kryptco/tap/kr" if OS.mac?

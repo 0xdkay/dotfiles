@@ -145,7 +145,8 @@ case "$1" in
     fi
 
     # dotfiles update
-    git pull origin master
+    git remote add downstream https://github.com/0xdkay/dotfiles.git 2</dev/null
+    git pull downstream master
 
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
@@ -170,14 +171,14 @@ case "$1" in
   github)
     # setup github
     echo "Type your github account: "
-    read GITHUB_ACCOUNT
-    ssh-keygen -t rsa -C $GITHUB_ACCOUNT
+    read -r GITHUB_ACCOUNT
+    ssh-keygen -t rsa -C "$GITHUB_ACCOUNT"
     eval $(ssh-agent)
-    ssh-add $HOME/.ssh/id_rsa
+    ssh-add "$HOME/.ssh/id_rsa"
     echo "need to add below public key to github"
-    cat $HOME/.ssh/id_rsa.pub
+    cat "$HOME/.ssh/id_rsa.pub"
     echo -n "press enter when you done..."
-    read t
+    read -r t
     ssh -T git@github.com
     ;;
 
@@ -189,7 +190,7 @@ case "$1" in
     sudo apt-get install -y build-essential cmake
     sudo apt-get install -y python-dev python3-dev
 
-    cd $HOME/.vim/plugged/YouCompleteMe
+    cd "$HOME/.vim/plugged/YouCompleteMe"
     ./install.py --clang-completer
     ;;
 

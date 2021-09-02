@@ -120,17 +120,17 @@ FZF-EOF"
   }
 fi
 
-# Load chruby
-if [ -e /usr/local/share/chruby/chruby.sh ]; then
-  source /usr/local/share/chruby/chruby.sh
-  source /usr/local/share/chruby/auto.sh
-fi
-
-# Load rbenv
-if [ -e "$HOME/.rbenv" ]; then
-  export PATH="$HOME/.rbenv/bin:$PATH"
-  eval "$(rbenv init - zsh)"
-fi
+## Load chruby
+#if [ -e /usr/local/share/chruby/chruby.sh ]; then
+#  source /usr/local/share/chruby/chruby.sh
+#  source /usr/local/share/chruby/auto.sh
+#fi
+#
+## Load rbenv
+#if [ -e "$HOME/.rbenv" ]; then
+#  export PATH="$HOME/.rbenv/bin:$PATH"
+#  eval "$(rbenv init - zsh)"
+#fi
 
 # Load pyenv
 if command -v pyenv &> /dev/null; then
@@ -144,22 +144,22 @@ elif [ -e "$HOME/.pyenv" ]; then
   eval "$(pyenv virtualenv-init - zsh)"
 fi
 
-# Load RVM into a shell session *as a function*
-if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-  source "$HOME/.rvm/scripts/rvm"
-
-  if [[ "$(type rvm | head -n 1)" == "rvm is a shell function" ]]; then
-    # Add RVM to PATH for scripting
-    PATH=$PATH:$HOME/.rvm/bin
-    export rvmsudo_secure_path=1
-
-    # Use right RVM gemset when using tmux
-    if [[ "$TMUX" != "" ]]; then
-      rvm use default
-      cd ..;cd -
-    fi
-  fi
-fi
+## Load RVM into a shell session *as a function*
+#if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+#  source "$HOME/.rvm/scripts/rvm"
+#
+#  if [[ "$(type rvm | head -n 1)" == "rvm is a shell function" ]]; then
+#    # Add RVM to PATH for scripting
+#    PATH=$PATH:$HOME/.rvm/bin
+#    export rvmsudo_secure_path=1
+#
+#    # Use right RVM gemset when using tmux
+#    if [[ "$TMUX" != "" ]]; then
+#      rvm use default
+#      cd ..;cd -
+#    fi
+#  fi
+#fi
 
 # Set GOPATH for Go
 if command -v go &> /dev/null; then
@@ -261,7 +261,7 @@ alias gstp='git stash pop'
 alias v='vim'
 alias vi='vim'
 
-alias ruby-server='ruby -run -ehttpd . -p8000 --bind-address=localhost'
+#alias ruby-server='ruby -run -ehttpd . -p8000 --bind-address=localhost'
 
 # http://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
 function man() {
@@ -280,5 +280,6 @@ function man() {
 if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
+export PATH=$HOME/.local/bin:$PATH
 
 LIME_SHOW_HOSTNAME=1

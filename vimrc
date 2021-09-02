@@ -216,9 +216,9 @@ Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 
 " Support file types
 " AdBlock
-Plug 'yous/adblock-filter.vim', {
-      \ 'branch': 'nocindent',
-      \ 'for': 'adblockfilter' }
+"Plug 'yous/adblock-filter.vim', {
+"      \ 'branch': 'nocindent',
+"      \ 'for': 'adblockfilter' }
 " Aheui
 "Plug 'yous/aheui.vim', { 'for': 'aheui' }
 " CUP
@@ -237,29 +237,29 @@ Plug 'rhysd/vim-grammarous', { 'for' : ['tex'] }
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " PHP
-Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
+"Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
 " Racket
 "Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
 " smali
-Plug 'kelwin/vim-smali', { 'for': 'smali' }
+"Plug 'kelwin/vim-smali', { 'for': 'smali' }
 " SMT-LIB
-Plug 'raichoo/smt-vim', { 'for': 'smt' }
+"Plug 'raichoo/smt-vim', { 'for': 'smt' }
 " Vader
 "Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " XML
-Plug 'othree/xml.vim', { 'for': 'xml' }
+"Plug 'othree/xml.vim', { 'for': 'xml' }
 " A solid language pack for Vim
-Plug 'sheerun/vim-polyglot'
+"Plug 'sheerun/vim-polyglot'
 
 " Python
 " A nicer Python indentation style for vim
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 
-" FSharp (F#)
-Plug 'fsharp/vim-fsharp', {
-      \ 'for': 'fsharp',
-      \ 'do':  'make fsautocomplete',
-      \}
+"" FSharp (F#)
+"Plug 'fsharp/vim-fsharp', {
+"      \ 'for': 'fsharp',
+"      \ 'do':  'make fsautocomplete',
+"      \}
 
 " Ruby
 "" Rake
@@ -275,7 +275,7 @@ Plug 'fsharp/vim-fsharp', {
 "" TomDoc
 "Plug 'wellbredgrapefruit/tomdoc.vim', { 'for': 'ruby' }
 "" LanguageTool
-"Plug 'vim-scripts/LanguageTool'
+"Plug 'dpelle/vim-LanguageTool'
 
 " Mac OS
 if has('mac') || has('macunix')

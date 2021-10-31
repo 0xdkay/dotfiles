@@ -39,6 +39,12 @@ if [ -d "$HOME/.local/bin" ]; then
   add_to_path_once "$HOME/.local/bin"
 fi
 
+# Load n
+if command -v n >/dev/null; then
+  export N_PREFIX="$HOME/.n"
+  add_to_path_once "$N_PREFIX/bin"
+fi
+
 # Set GOPATH for Go
 if command -v go >/dev/null; then
   [ ! -e "$HOME/.go" ] && mkdir "$HOME/.go"
@@ -65,14 +71,21 @@ fi
 # Load pyenv
 if command -v pyenv >/dev/null; then
   export PYENV_ROOT="$HOME/.pyenv"
+  eval "$(pyenv init --path 2>/dev/null)"
 elif [ -e "$HOME/.pyenv" ]; then
   export PYENV_ROOT="$HOME/.pyenv"
   add_to_path_once "$HOME/.pyenv/bin"
+  eval "$(pyenv init --path 2>/dev/null)"
 fi
 
 # Unset local functions and variables
 unset -f add_to_path_once
 unset UNAME
+
+# WSL
+if [ -e /proc/version ] && grep -q Microsoft /proc/version; then
+  export COLORTERM='truecolor'
+fi
 
 # Set VISUAL
 if command -v vim >/dev/null; then
@@ -85,10 +98,4 @@ if [ -n "$BASH_VERSION" ]; then
   if [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
   fi
-fi
-
-if [ -x "$(command -v pyenv)" ]; then
-  export PATH="/home/dongkwan/.pyenv/bin:$PATH"
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
 fi

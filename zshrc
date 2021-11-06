@@ -7,6 +7,7 @@ if command -v keychain >/dev/null; then
     KEY='id_rsa'
   fi
   if [ -n "$KEY" ]; then
+    echo "Setting keychain"
     if [ "$(uname)" = 'Darwin' ]; then
       eval `keychain --eval --quiet --agents ssh --inherit any $KEY`
     else

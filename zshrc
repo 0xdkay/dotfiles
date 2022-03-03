@@ -52,10 +52,10 @@ fi
 bindkey -e
 
 # Use Zinit
-if [ ! -e "$HOME/.zinit/bin/zinit.zsh" ]; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zinit/master/doc/install.sh)"
+if [ ! -e "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh" ]; then
+  sh -c "$(curl -fsSL https://git.io/zinit-install)"
 fi
-source "$HOME/.zinit/bin/zinit.zsh"
+source "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 
 # Additional completion definitions for Zsh
 if is-at-least 5.3; then
@@ -287,3 +287,13 @@ export PATH=$HOME/.local/bin:$PATH
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Load a few important annexes, without Turbo
+# (this is currently required for annexes)
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
+
+### End of Zinit's installer chunk

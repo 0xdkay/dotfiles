@@ -78,10 +78,6 @@ elif [ -e "$HOME/.pyenv" ]; then
   eval "$(pyenv init --path 2>/dev/null)"
 fi
 
-# Unset local functions and variables
-unset -f add_to_path_once
-unset UNAME
-
 # WSL
 if [ -e /proc/version ] && grep -q Microsoft /proc/version; then
   export COLORTERM='truecolor'
@@ -99,3 +95,15 @@ if [ -n "$BASH_VERSION" ]; then
     . "$HOME/.bashrc"
   fi
 fi
+
+# setup npm
+if command -v npm >/dev/null; then
+  if [ ! -e "$HOME/.npm-global" ]; then
+    mkdir "$HOME/.npm-global"
+  fi
+  add_to_path_once "$HOME/.npm-global/bin"
+fi
+
+# Unset local functions and variables
+unset -f add_to_path_once
+unset UNAME

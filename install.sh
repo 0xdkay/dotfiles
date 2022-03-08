@@ -172,7 +172,7 @@ case "$1" in
     echo "Type your github account: "
     read -r GITHUB_ACCOUNT
     ssh-keygen -t rsa -C "$GITHUB_ACCOUNT"
-    eval $(ssh-agent)
+    eval "$(ssh-agent)"
     ssh-add "$HOME/.ssh/id_rsa"
     echo "need to add below public key to github"
     cat "$HOME/.ssh/id_rsa.pub"

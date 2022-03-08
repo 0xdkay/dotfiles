@@ -8,6 +8,27 @@ echoerr() {
   echo "$@" 1>&2
 }
 
+usage() {
+  echo "usage: $(basename "$0") <command>"
+  echo ''
+  echo 'Available commands:'
+  echo '    update        Update installed packages'
+  echo '    base          Install basic packages'
+  echo '    link          Install symbolic links'
+  echo '    antibody      Install Antibody'
+  echo '    pwndbg        Install pwndbg'
+  echo '    github        Install github account'
+  echo '    brew          Install Homebrew on macOS (or Linux)'
+  echo '    formulae      Install Homebrew formulae using Brewfile'
+  echo '    pyenv         Install pyenv with pyenv-virtualenv'
+  echo '    rustup        Install rustup'
+  echo '    ruby-install  Install ruby-install'
+  echo '    chruby        Install chruby'
+  echo '    rbenv         Install rbenv'
+  echo '    rvm           Install RVM'
+  echo '    weechat       Install WeeChat configuration'
+}
+
 init_submodules() {
   (cd "$DIR" && git submodule init)
   (cd "$DIR" && git submodule update)
@@ -257,23 +278,6 @@ case "$1" in
     replace_file 'weechat'
     ;;
   *)
-    echo "usage: $(basename "$0") <command>"
-    echo ''
-    echo 'Available commands:'
-    echo '    update        Update installed packages'
-    echo '    base          Install basic packages'
-    echo '    link          Install symbolic links'
-    echo '    antibody      Install Antibody'
-    echo '    pwndbg        Install pwndbg'
-    echo '    github        Install github account'
-    echo '    brew          Install Homebrew on macOS (or Linux)'
-    echo '    formulae      Install Homebrew formulae using Brewfile'
-    echo '    pyenv         Install pyenv with pyenv-virtualenv'
-    echo '    rustup        Install rustup'
-    echo '    ruby-install  Install ruby-install'
-    echo '    chruby        Install chruby'
-    echo '    rbenv         Install rbenv'
-    echo '    rvm           Install RVM'
-    echo '    weechat       Install WeeChat configuration'
+    usage
     ;;
 esac

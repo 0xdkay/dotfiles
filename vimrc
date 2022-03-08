@@ -11,11 +11,11 @@ endif
 " =============================================================================
 
 function! s:VersionRequirement(val, min)
-  for l:idx in range(0, len(a:min) - 1)
-    let l:v = get(a:val, l:idx, 0)
-    if l:v < a:min[l:idx]
+  for idx in range(0, len(a:min) - 1)
+    let v = get(a:val, idx, 0)
+    if v < a:min[idx]
       return 0
-    elseif l:v > a:min[l:idx]
+    elseif v > a:min[idx]
       return 1
     endif
   endfor
@@ -56,15 +56,15 @@ function! s:DownloadVimPlug()
     return
   endif
   if empty(glob(s:vimfiles . '/autoload/plug.vim'))
-    let l:plug_url = 'https://github.com/junegunn/vim-plug.git'
-    let l:tmp = tempname()
-    let l:new = l:tmp . '/plug.vim'
+    let plug_url = 'https://github.com/junegunn/vim-plug.git'
+    let tmp = tempname()
+    let new = tmp . '/plug.vim'
 
     try
-      let l:out = system(printf('git clone --depth 1 %s %s', l:plug_url, l:tmp))
+      let out = system(printf('git clone --depth 1 %s %s', plug_url, tmp))
       if v:shell_error
         echohl ErrorMsg
-        echomsg 'Error downloading vim-plug: ' . l:out
+        echomsg 'Error downloading vim-plug: ' . out
         echohl NONE
         return
       endif
@@ -74,9 +74,9 @@ function! s:DownloadVimPlug()
       endif
       call rename(new, s:vimfiles . '/autoload/plug.vim')
     finally
-      if isdirectory(l:tmp)
-        let l:dir = '"' . escape(l:tmp, '"') . '"'
-        silent call system((has('win32') ? 'rmdir /S /Q ' : 'rm -rf ') . l:dir)
+      if isdirectory(tmp)
+        let dir = '"' . escape(tmp, '"') . '"'
+        silent call system((has('win32') ? 'rmdir /S /Q ' : 'rm -rf ') . dir)
       endif
     endtry
   endif
@@ -108,6 +108,10 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'chrisbra/Recover.vim'
 " obsession.vim: continuously updated session files
 Plug 'tpope/vim-obsession'
+if has('timers') && exists('v:exiting')
+  " Fix CursorHold Performance
+  Plug 'antoinemadec/FixCursorHold.nvim'
+endif
 " Ultimate hex editing system with Vim
 Plug 'Shougo/vinarise.vim'
 " Vim sugar for the UNIX shell commands
@@ -144,6 +148,10 @@ if !has('win32') && (!has('win32unix') || executable('go'))
 endif
 " Directory viewer for Vim
 Plug 'justinmk/vim-dirvish'
+if !has('win32')
+  " Git support for dirvish.vim
+  Plug 'kristijanhusak/vim-dirvish-git'
+endif
 if !has('nvim') && !has('patch-8.1.1218')
   " Tab-specific directories
   Plug 'vim-scripts/tcd.vim'
@@ -174,10 +182,10 @@ endif
 " Motions and text changing
 " Autocomplete if end
 Plug 'tpope/vim-endwise'
-" The missing motion for Vim
-Plug 'justinmk/vim-sneak'
-" Provide CamelCase motion through words
-Plug 'bkad/CamelCaseMotion'
+" Lightning fast left-right movement in Vim
+Plug 'unblevable/quick-scope'
+" More useful word motions for Vim
+Plug 'chaoren/vim-wordmotion'
 " The matchit plugin from Vim
 Plug 'chrisbra/matchit'
 " Python matchit support
@@ -202,21 +210,13 @@ endif
 Plug 'vim-scripts/a.vim'
 " Enable repeating supported plugin maps with "."
 Plug 'tpope/vim-repeat'
-" Explore filesystem
-"Plug 'scrooloose/nerdtree'
-" Source code browser
-"Plug 'taglist.vim'
 
 " Vim UI
 " A light and configurable statusline/tabline for Vim
 Plug 'itchyny/lightline.vim'
-if has('patch-7.4.1557')
-  " Vim plugin that shows the context of the currently visible buffer contents
-  Plug 'wellle/context.vim'
-endif
 " Highlight the exact differences, based on characters and words
 Plug 'rickhowe/diffchar.vim'
-if !has('patch-8.1.1270')
+if !has('patch-8.1.1270') && !has('nvim-0.4.0')
   " vim-searchindex: display number of search matches & index of a current match
   Plug 'google/vim-searchindex'
 endif
@@ -233,7 +233,10 @@ Plug 'junegunn/rainbow_parentheses.vim', { 'for': [
       \ 'lisp',
       \ 'racket',
       \ 'scheme'] }
-if has('signs')
+if has('patch-8.0.902') || has('nvim')
+  " Show a diff using Vim its sign column.
+  Plug 'mhinz/vim-signify'
+elseif has('signs')
   " Show a git diff in the gutter and stages/reverts hunks
   Plug 'airblade/vim-gitgutter'
 endif
@@ -244,11 +247,9 @@ Plug 'chrisbra/Colorizer'
 
 " Support file types
 " AdBlock
-"Plug 'yous/adblock-filter.vim', { 'for': 'adblockfilter' }
+Plug 'yous/adblock-filter.vim', { 'for': 'adblockfilter' }
 " Aheui
-"Plug 'yous/aheui.vim', { 'for': 'aheui' }
-" CUP
-"Plug 'gcollura/cup.vim', { 'for': 'cup' }
+Plug 'yous/aheui.vim', { 'for': 'aheui' }
 " GNU As
 Plug 'Shirk/vim-gas', { 'for': 'gas' }
 " LaTeX
@@ -258,22 +259,20 @@ Plug 'godlygeek/tabular', { 'for': 'markdown' } |
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " PHP
 Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
-" Rails
-"Plug 'tpope/vim-rails'
-"if v:version >= 700
-"  " ANSI escape sequences concealed, but highlighted as specified (conceal)
-"  Plug 'powerman/vim-plugin-AnsiEsc', { 'for': 'railslog' }
-"endif
+if v:version >= 700
+  " ANSI escape sequences concealed, but highlighted as specified (conceal)
+  Plug 'powerman/vim-plugin-AnsiEsc', { 'for': 'railslog' }
+endif
 " Rake
-"Plug 'tpope/vim-rake'
+Plug 'tpope/vim-rake'
 " RBS
-"Plug 'pocke/rbs.vim'
+Plug 'pocke/rbs.vim'
 " RuboCop
-"Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
+Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
 " smali
-"Plug 'kelwin/vim-smali', { 'for': 'smali' }
+Plug 'kelwin/vim-smali', { 'for': 'smali' }
 " SMT-LIB
-"Plug 'raichoo/smt-vim', { 'for': 'smt' }
+Plug 'raichoo/smt-vim', { 'for': 'smt' }
 " Vader
 Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " A solid language pack for Vim
@@ -286,12 +285,6 @@ Plug 'sheerun/vim-polyglot'
 if has('mac') || has('macunix')
   " Add plist editing support to Vim
   Plug 'darfink/vim-plist'
-  " Launch queries for Dash.app from inside Vim
-  Plug 'rizzatti/dash.vim', { 'on': [
-        \ 'Dash',
-        \ 'DashKeywords',
-        \ '<Plug>DashSearch',
-        \ '<Plug>DashGlobalSearch'] }
 endif
 
 call plug#end()
@@ -326,11 +319,16 @@ endif
 " How keyword completion works when CTRL-P and CTRL-N are used
 " i: scan current and included files
 set complete-=i
-if has('mac') && $VIM == '/usr/share/vim'
+if has('mac') && $VIM ==# '/usr/share/vim'
   set diffopt-=internal
 elseif has('patch-8.1.0360')
   set diffopt+=algorithm:patience
 endif
+if !isdirectory(s:vimfiles . '/swap')
+  call mkdir(s:vimfiles . '/swap', 'p')
+endif
+" List of directory names for the swap file, separated with commas
+execute 'set directory^=' . s:vimfiles . '/swap//'
 if has('multi_byte')
   set fileencodings=ucs-bom,utf-8,cp949,latin1
 endif
@@ -404,8 +402,10 @@ if has('path_extra')
 endif
 " Maximum number of changes that can be undone
 set undolevels=1000
-" Update swap file and trigger CursorHold after 1 second
-set updatetime=100
+if !has_key(g:plugs, 'FixCursorHold.nvim')
+  " Update swap file and trigger CursorHold after 100ms
+  set updatetime=100
+endif
 if exists('+wildignorecase')
   " Ignore case when completing file names and directories
   set wildignorecase
@@ -457,6 +457,9 @@ endif
 set display+=lastline
 " Show unprintable characters as a hex number
 set display+=uhex
+if has('extra_search')
+  set hlsearch
+endif
 " Always show a status line
 set laststatus=2
 set number
@@ -558,16 +561,15 @@ if has('gui_running')
     " Restore window size (columns and lines) and position
     " from values stored in vimsize file.
     " Must set font first so columns and lines are based on font size.
-    let l:f = s:ScreenFilename()
-    if has('gui_running') && g:screen_size_restore_pos && filereadable(l:f)
-      let l:vim_instance =
+    let f = s:ScreenFilename()
+    if has('gui_running') && g:screen_size_restore_pos && filereadable(f)
+      let vim_instance =
             \ (g:screen_size_by_vim_instance == 1 ? (v:servername) : 'GVIM')
-      for l:line in readfile(l:f)
-        let l:sizepos = split(l:line)
-        if len(l:sizepos) == 5 && l:sizepos[0] == l:vim_instance
-          silent! execute 'set columns=' . l:sizepos[1] .
-                \ ' lines=' . l:sizepos[2]
-          silent! execute 'winpos ' . l:sizepos[3] . ' ' . l:sizepos[4]
+      for line in readfile(f)
+        let sizepos = split(line)
+        if len(sizepos) == 5 && sizepos[0] == vim_instance
+          silent! execute 'set columns=' . sizepos[1] . ' lines=' . sizepos[2]
+          silent! execute 'winpos ' . sizepos[3] . ' ' . sizepos[4]
           return
         endif
       endfor
@@ -576,20 +578,20 @@ if has('gui_running')
   function! s:ScreenSave()
     " Save window size and position.
     if has('gui_running') && g:screen_size_restore_pos
-      let l:vim_instance =
+      let vim_instance =
             \ (g:screen_size_by_vim_instance == 1 ? (v:servername) : 'GVIM')
-      let l:data = l:vim_instance . ' ' . &columns . ' ' . &lines . ' ' .
+      let data = vim_instance . ' ' . &columns . ' ' . &lines . ' ' .
             \ (getwinposx() < 0 ? 0: getwinposx()) . ' ' .
             \ (getwinposy() < 0 ? 0: getwinposy())
-      let l:f = s:ScreenFilename()
-      if filereadable(l:f)
-        let l:lines = readfile(l:f)
-        call filter(l:lines, "v:val !~ '^" . l:vim_instance . "\\>'")
-        call add(l:lines, l:data)
+      let f = s:ScreenFilename()
+      if filereadable(f)
+        let lines = readfile(f)
+        call filter(lines, "v:val !~ '^" . vim_instance . "\\>'")
+        call add(lines, data)
       else
-        let l:lines = [l:data]
+        let lines = [data]
       endif
-      call writefile(l:lines, l:f)
+      call writefile(lines, f)
     endif
   endfunction
   if !exists('g:screen_size_restore_pos')
@@ -735,6 +737,7 @@ augroup END
 
 " Commander
 nnoremap ; :
+nnoremap <Space> ;
 
 " We do line wrap
 noremap j gj
@@ -756,7 +759,9 @@ inoremap <expr> <C-E> pumvisible() ? "\<C-E>" : "\<End>"
 function! s:CloseBrace()
   let line_num = line('.')
   let next_line = getline(line_num + 1)
-  if !empty(next_line) &&
+  if col('.') != col('$')
+    return "{\<CR>"
+  elseif !empty(next_line) &&
         \ indent(line_num + 1) == indent(line_num) &&
         \ next_line =~# '^\s*}'
     return "{\<CR>"
@@ -825,14 +830,14 @@ nnoremap <Leader><C-L> <C-L>
 
 " Search for visually selected text
 function! s:VSearch(cmd)
-  let l:old_reg = getreg('"')
-  let l:old_regtype = getregtype('"')
+  let old_reg = getreg('"')
+  let old_regtype = getregtype('"')
   normal! gvy
   let pat = escape(@", a:cmd . '\')
   let pat = substitute(pat, '\n', '\\n', 'g')
   let @/ = '\V' . pat
   normal! gV
-  call setreg('"', l:old_reg, l:old_regtype)
+  call setreg('"', old_reg, old_regtype)
 endfunction
 if has_key(g:plugs, 'vim-searchindex')
   vnoremap * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>zz<Plug>SearchIndex
@@ -924,7 +929,6 @@ if has('cscope') && executable('cscope')
 
   set cscopetag
   set cscopetagorder=0
-  set cscopeverbose
   call s:FindCscopeDB()
 
   " 0 or s: Find this C symbol
@@ -1001,32 +1005,6 @@ augroup FileTypeMappings
         \   compiler gcc |
         \   setlocal makeprg=g++\ -o\ %<\ % |
         \ endif
-
-  " Tex, grammarrous
-"  autocmd FileType tex nnoremap <buffer> <F5> :GrammarousCheck<CR>
-"  autocmd FileType tex inoremap <buffer> <F5> :GrammarousCheck<CR>
-"  autocmd FileType tex nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
-"  autocmd FileType tex nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
-"  autocmd FileType tex nmap <buffer><C-f> <Plug>(grammarous-fixit)
-"  autocmd FileType tex nmap <buffer><C-r> <Plug>(grammarous-remove-error)
-"  autocmd FileType tex nmap <buffer><C-x> <Plug>(grammarous-reset)
-
-    let g:grammarous#hooks = {}
-    function! g:grammarous#hooks.on_check(errs) abort
-        nmap <buffer><C-n> <Plug>(grammarous-move-to-next-error)
-        nmap <buffer><C-p> <Plug>(grammarous-move-to-previous-error)
-        nmap <buffer><C-f> <Plug>(grammarous-fixit)
-        nmap <buffer><C-r> <Plug>(grammarous-remove-error)
-        nmap <buffer><C-x> <Plug>(grammarous-reset)
-    endfunction
-
-    function! g:grammarous#hooks.on_reset(errs) abort
-        nunmap <buffer><C-n>
-        nunmap <buffer><C-p>
-        nunmap <buffer><C-f>
-        nunmap <buffer><C-r>
-        nunmap <buffer><C-x>
-    endfunction
 
   " Markdown code snippets
   autocmd FileType markdown inoremap <buffer> <LocalLeader>` ```
@@ -1109,7 +1087,7 @@ function! s:CheckLeftBuffers(quitpre)
         break
       endif
     endwhile
-    if l:i == winnr('$') + 1
+    if i == winnr('$') + 1
       call feedkeys(":only\<CR>:q\<CR>", 'n')
     endif
   endif
@@ -1129,9 +1107,6 @@ augroup AutoUpdates
   " Automatically update the diff after writing changes
   autocmd BufWritePost * if &diff | diffupdate | endif
 
-  " Automatically update the diff after writing changes
-  autocmd BufWritePost * if &diff | diffupdate | endif
-
   " Exit Paste mode when leaving Insert mode
   autocmd InsertLeave * if &paste | set nopaste | endif
 
@@ -1143,14 +1118,20 @@ augroup AutoUpdates
   endif
 augroup END
 
+" WSL
+if has('unix') && executable('clip.exe')
+  augroup AutoClipboard
+    autocmd!
+    autocmd TextYankPost *
+          \ if v:event.operator ==# 'y' | call system('clip.exe', @0) | endif
+  augroup END
+endif
+
 augroup FileTypeAutocmds
   autocmd!
 
   " Doxygen support
   autocmd FileType c,cpp setlocal syntax+=.doxygen
-
-  " Check if any buffers were changed outside of Vim
-  autocmd FocusGained,BufEnter * checktime
 
   " Keyword lookup program
   autocmd FileType c,cpp setlocal keywordprg=man
@@ -1167,9 +1148,6 @@ augroup FileTypeAutocmds
   " ASM view
   autocmd BufNewFile,BufRead *.[sS] setlocal filetype=gas
 
-  " ASM view
-  autocmd BufNewFile,BufRead *.S setlocal filetype=gas
-
   " Gradle view
   autocmd BufNewFile,BufRead *.gradle setlocal filetype=groovy
 
@@ -1183,15 +1161,6 @@ augroup FileTypeAutocmds
 
   " zsh-theme view
   autocmd BufNewFile,BufRead *.zsh-theme setlocal filetype=zsh
-augroup END
-
-" Disable swapfile for Dropbox
-augroup DisableSwap
-  autocmd!
-  autocmd BufNewFile,BufRead *
-        \ if resolve(expand('%:p')) =~# '/Dropbox/' |
-        \   setlocal noswapfile |
-        \ endif
 augroup END
 
 " Auto insert for git commit
@@ -1277,6 +1246,9 @@ if has_key(g:plugs, 'tcd.vim')
   augroup END
 endif
 
+" FixCursorHold.nvim
+let g:cursorhold_updatetime = 100
+
 " vim-gutentags
 function! s:BuildTagsFileListCmd(prog)
   let filetypes = [
@@ -1331,7 +1303,6 @@ let g:gutentags_cscope_build_inverted_index = 1
 if has_key(g:plugs, 'fzf.vim')
   nnoremap <C-P> :Files<CR>
   nnoremap g<C-P> :GFiles<CR>
-  nnoremap t<C-P> :Tags<CR>
   nnoremap c<C-P> :History :<CR>
   if executable('rg')
     function! s:GetVisualSelection()
@@ -1410,6 +1381,7 @@ if has_key(g:plugs, 'coc.nvim')
   if has_key(g:plugs, 'ale')
     call coc#config('diagnostic.displayByAle', v:true)
   endif
+  call coc#config('coc.preferences.semanticTokensHighlights', v:false)
   call coc#config('coc.preferences.bracketEnterImprove', v:false)
 
   " coc-clangd
@@ -1423,22 +1395,20 @@ if has_key(g:plugs, 'coc.nvim')
     endif
   endif
 
-  " coc-python
+  " coc-pyright
   for s:linter in [
         \ 'flake8',
         \ 'bandit',
         \ 'mypy',
-        \ 'pep8',
+        \ 'pytype',
         \ 'prospector',
         \ 'pydocstyle',
-        \ 'pylama']
+        \ 'pylama',
+        \ 'pylint']
     if executable(s:linter)
       call coc#config('python.linting.' . s:linter . 'Enabled', v:true)
     endif
   endfor
-  if !executable('pylint')
-    call coc#config('python.linting.pylintEnabled', v:false)
-  endif
   unlet s:linter
   if has('python3')
     call coc#config('python.pythonPath', exepath('python3'))
@@ -1446,14 +1416,26 @@ if has_key(g:plugs, 'coc.nvim')
     call coc#config('python.pythonPath', exepath('python'))
   endif
 
+  " coc-rust-analyzer
+  if executable('rust-analyzer')
+    call coc#config('rust-analyzer.server.path', exepath('rust-analyzer'))
+    call coc#add_extension('coc-rust-analyzer')
+  endif
+
+  " coc-solargraph
+  call coc#config('solargraph.promptDownload', v:false)
+  if executable('solargraph')
+    call coc#config('solargraph.diagnostics', v:true)
+    call coc#add_extension('coc-solargraph')
+  endif
+
   call coc#add_extension(
         \ 'coc-cmake',
         \ 'coc-css',
         \ 'coc-emoji',
         \ 'coc-json',
-        \ 'coc-python',
-        \ 'coc-tag',
-        \ 'coc-tsserver')
+        \ 'coc-pyright',
+        \ 'coc-tag')
 
   augroup CocFileType
     autocmd!
@@ -1475,17 +1457,16 @@ endif
 " ale
 if has_key(g:plugs, 'ale')
   let g:ale_echo_msg_format = '[%linter%] %code: %%s'
-  let g:ale_linters = {
-        \ 'rust': 'all' }
+  let g:ale_hover_cursor = 0
   let g:ale_linters_ignore = {
         \ 'python': [
-        \   'bandit',
         \   'flake8',
         \   'mypy',
-        \   'prospector',
-        \   'pydocstyle',
-        \   'pylama',
-        \   'pylint'] }
+        \   'pylint',
+        \   'pyright'] }
+  if executable('rust-analyzer')
+    let g:ale_linters_ignore['rust'] = ['cargo']
+  endif
   let g:ale_set_highlights = 0
 
   " ale-c-options, ale-cpp-options
@@ -1517,6 +1498,7 @@ if has_key(g:plugs, 'ale')
         \ '-hicpp-signed-bitwise',
         \ '-hicpp-uppercase-literal-suffix',
         \ '-llvm-*',
+        \ '-llvmlibc-*',
         \ '-modernize-use-trailing-return-type',
         \ '-readability-else-after-return',
         \ '-readability-magic-numbers',
@@ -1573,21 +1555,11 @@ augroup EndwiseCMake
         \ let b:endwise_syngroups = 'rbsDefine'
 augroup END
 
-" vim-sneak
-let g:sneak#s_next = 1
-map f <Plug>Sneak_s
-map F <Plug>Sneak_S
+" quick-scope
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
-" CamelCaseMotion
-function! s:CreateCamelCaseMotionMappings()
-  for mode in ['n', 'o', 'x']
-    for motion in ['w', 'b', 'e']
-      let target_mapping = '<Plug>CamelCaseMotion_' . motion
-      execute mode . 'map <silent> <Leader>' . motion . ' ' . target_mapping
-    endfor
-  endfor
-endfunction
-call s:CreateCamelCaseMotionMappings()
+" vim-wordmotion
+let g:wordmotion_prefix = '<Leader>'
 
 " bullets.vim
 let g:bullets_enabled_file_types = [
@@ -1595,6 +1567,9 @@ let g:bullets_enabled_file_types = [
       \ 'gitsendemail',
       \ 'markdown',
       \ 'text']
+let g:bullets_pad_right = 0
+let g:bullets_outline_levels = []
+let g:bullets_checkbox_markers = ' ---x'
 
 " vim-closetag
 let g:closetag_filetypes = 'html,javascript.jsx,php,xhtml,xml'
@@ -1672,7 +1647,7 @@ function! LightLineWide(component)
         \ 'fileformat': 70,
         \ 'filetype': 70,
         \ 'percent': 50 }
-  return winwidth(0) >= get(l:component_visible_width, a:component, 0)
+  return winwidth(0) >= get(component_visible_width, a:component, 0)
 endfunction
 
 function! LightLineVisible(component)
@@ -1684,7 +1659,7 @@ function! LightLineVisible(component)
 endfunction
 
 function! LightLineMode()
-  let l:short_mode_map = {
+  let short_mode_map = {
         \ 'n': 'N',
         \ 'i': 'I',
         \ 'R': 'R',
@@ -1702,7 +1677,7 @@ function! LightLineMode()
         \ fname ==# 'ControlP' ? 'CtrlP' :
         \ fname =~# 'NERD_tree' ? '' :
         \ LightLineWide('mode') ? lightline#mode() :
-        \ get(l:short_mode_map, mode(), l:short_mode_map['?'])
+        \ get(short_mode_map, mode(), short_mode_map['?'])
 endfunction
 
 function! LightLineFilename()
@@ -1860,16 +1835,6 @@ if has_key(g:plugs, 'syntastic')
   command! LightLineSyntasticToggleMode call s:LightLineSyntasticToggleMode()
 endif
 
-" context.vim
-if has_key(g:plugs, 'context.vim')
-  let g:context_add_mappings = 0
-  nnoremap <silent> <expr> <C-Y> context#util#map('<C-Y>')
-  nnoremap <silent> <expr> <C-E> context#util#map('<C-E>')
-  nnoremap <silent> <expr> zz    context#util#map('zz')
-  nnoremap <silent> <expr> zb    context#util#map('zb')
-  nnoremap <silent> <expr> zt    context#util#map_zt()
-endif
-
 " vim-searchindex
 cnoremap <CR> <CR>
 
@@ -1886,22 +1851,32 @@ augroup RainbowParenthesesFileType
   autocmd FileType clojure,lisp,racket,scheme RainbowParentheses
 augroup END
 
+" vim-signify
+if has_key(g:plugs, 'vim-signify')
+  nnoremap <silent> [c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(signify-prev-hunk)"<CR>zz
+  nnoremap <silent> ]c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(signify-next-hunk)"<CR>zz
+  nnoremap <Leader>hp :<C-U>SignifyHunkDiff<CR>
+  nnoremap <Leader>hu :<C-U>SignifyHunkUndo<CR>
+endif
+
 " vim-gitgutter
-function! s:RedefineGitGutterAutocmd()
-  if get(g:, 'gitgutter_async', 0) && gitgutter#async#available()
-    augroup gitgutter
-      autocmd! CursorHold,CursorHoldI
-      autocmd CursorHold,CursorHoldI *
-            \ call gitgutter#process_buffer(bufnr(''), 1)
-    augroup END
-  endif
-endfunction
-augroup GitGutterConfig
-  autocmd!
-  autocmd VimEnter * call s:RedefineGitGutterAutocmd()
-augroup END
-nnoremap <silent> [c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(GitGutterPrevHunk)"<CR>zz
-nnoremap <silent> ]c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(GitGutterNextHunk)"<CR>zz
+if has_key(g:plugs, 'vim-gitgutter')
+  function! s:RedefineGitGutterAutocmd()
+    if get(g:, 'gitgutter_async', 0) && gitgutter#async#available()
+      augroup gitgutter
+        autocmd! CursorHold,CursorHoldI
+        autocmd CursorHold,CursorHoldI *
+              \ call gitgutter#process_buffer(bufnr(''), 1)
+      augroup END
+    endif
+  endfunction
+  augroup GitGutterConfig
+    autocmd!
+    autocmd VimEnter * call s:RedefineGitGutterAutocmd()
+  augroup END
+  nnoremap <silent> [c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(GitGutterPrevHunk)"<CR>zz
+  nnoremap <silent> ]c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(GitGutterNextHunk)"<CR>zz
+endif
 
 " goyo.vim
 nnoremap <Leader>G :Goyo<CR>
@@ -1912,6 +1887,9 @@ let g:colorizer_disable_bufleave = 1
 
 " adblock-filter.vim
 let g:adblock_filter_auto_checksum = 1
+
+" vim-gas
+let g:gasCppComments = 1
 
 " vimtex
 if has('win32unix')
@@ -1947,43 +1925,11 @@ let g:vimtex_syntax_minted = [
       \   'lang': 'ruby'
       \ }]
 
-" vimtex
-if has('win32unix')
-  let g:vimtex_complete_enabled = 0
-  let g:vimtex_latexmk_enabled = 0
-  let g:vimtex_view_enabled = 0
-endif
-if !has('clientserver')
-  let g:vimtex_latexmk_callback = 0
-  let g:vimtex_compiler_latexmk = {'callback' : 0}
-endif
-if !empty(glob('/Applications/Skim.app'))
-  let g:vimtex_view_general_viewer =
-        \ '/Applications/Skim.app/Contents/SharedSupport/displayline'
-  let g:vimtex_view_general_options = '-r @line @pdf @tex'
-elseif executable('SumatraPDF.exe')
-  let g:vimtex_view_general_viewer = 'SumatraPDF'
-  let g:vimtex_view_general_options =
-        \ '-reuse-instance -forward-search @tex @line @pdf'
-  let g:vimtex_view_general_options_latexmk = '-reuse-instance'
-endif
-let g:vimtex_syntax_minted = [
-      \ {
-      \   'lang': 'c'
-      \ },
-      \ {
-      \   'lang': 'cpp'
-      \ },
-      \ {
-      \   'lang': 'python'
-      \ },
-      \ {
-      \   'lang': 'ruby'
-      \ }]
-
 " vim-markdown
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_emphasis_multiline = 0
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
 let g:vim_markdown_fenced_languages = [
       \ 'bat=dosbatch', 'batch=dosbatch',
       \ 'coffeescript=coffee',
@@ -2042,24 +1988,13 @@ if has('mac') || has('macunix')
           \ if getline(1) =~# '^bplist' |
           \   call s:ConvertBinaryPlist() |
           \ endif
-    autocmd BufNewFile *.plist
-          \ if !get(b:, 'plist_original_format') |
-          \   let b:plist_original_format = 'xml' |
-          \ endif
+    autocmd BufNewFile *.plist set filetype=xml
   augroup END
   " Disable default autocmds
   let g:loaded_plist = 1
   let g:plist_display_format = 'xml'
   let g:plist_save_format = ''
-  let g:plist_json_filetype = 'json'
-
-  " dash.vim
-  let g:dash_map = {
-        \ 'java': 'android' }
-  nmap <Leader>d <Plug>DashSearch
 endif
-
 
 " }}}
 " =============================================================================
-

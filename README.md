@@ -131,6 +131,13 @@ Then install Homebrew formulae with:
 ./install.sh formulae
 ```
 
+On macOS prior to Mojave, install Rust using rustup, and then install several
+utilities using `cargo`:
+
+``` sh
+cargo install bat fd-find gitui ripgrep
+```
+
 ### Ruby
 
 #### chruby
@@ -184,23 +191,6 @@ If you want to install [rbenv](https://github.com/sstephenson/rbenv),
 ./install.sh rbenv
 ```
 
-#### Gems
-
-If you are using RVM,
-
-``` sh
-gem update --system
-rvm use current@global
-gem install rubocop webrick
-```
-
-Otherwise just install gems:
-
-``` sh
-gem update --system
-gem install rubocop webrick
-```
-
 ### Rust
 
 If you want to install [rustup](https://rustup.rs),
@@ -252,22 +242,6 @@ To make RVM works with Vim on OS X Yosemite or earlier, move `/etc/zshenv` to
 sudo mv /etc/zshenv /etc/zshrc
 ```
 
-#### Antibody
-
-If you want to install [Antibody](https://getantibody.github.io), if you're on
-OS X,
-
-``` sh
-brew tap getantibody/homebrew-antibody
-brew install antibody
-```
-
-Otherwise,
-
-``` sh
-./install.sh antibody
-```
-
 ### Vim
 
 To install [Vim](http://www.vim.org) plugins,
@@ -310,6 +284,7 @@ or [Syntastic](https://github.com/vim-syntastic/syntastic):
   - jedi: `pip install jedi`
 - Ruby
   - RuboCop: `gem install rubocop`
+  - Solargraph: `gem install solargraph`
 - SASS, SCSS
   - stylelint: `npm install -g stylelint stylelint-config-sass-guidelines`
 

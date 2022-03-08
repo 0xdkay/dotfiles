@@ -8,35 +8,38 @@ if OS.mac?
   brew "ctags"
   brew "git"
   brew "openssh"
-  brew "tmux"
   brew "wget"
-  brew "zsh"
 
   # QLColorCode
   brew "highlight" if MacOS.version < :catalina
 end
 
 # Utilities
-brew "bat"
-brew "fd"
-brew "htop"
+brew "bottom"
 brew "keychain" if OS.mac?
 brew "pre-commit"
-brew "ripgrep"
-brew "tig"
+brew "shellcheck"
+brew "tmux"
 brew "z"
+
+# Don't have bottles for Rust
+unless OS.mac? && MacOS.version < :mojave
+  brew "bat"
+  brew "fd"
+  brew "gitui"
+  brew "ripgrep"
+end
 
 # Python
 brew "python"
 brew "pyenv"
-brew "pyenv-virtualenv"
 
 # Ruby
 brew "ruby"
 brew "chruby"
 
 # Node.js
-brew "node"
+brew "n"
 
 # Vim
 brew "vim"

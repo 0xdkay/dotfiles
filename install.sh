@@ -127,7 +127,6 @@ install_link() {
     'p10k.zsh' \
     'profile' \
     'screenrc' \
-    'tigrc' \
     'tmux.conf' \
     'vimrc' \
     'vintrc.yaml' \
@@ -240,7 +239,6 @@ case "$1" in
       curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     fi
     ;;
-
   rbenv)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install rbenv
@@ -264,7 +262,7 @@ case "$1" in
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     ;;
   rvm)
-    command curl -sSL https://get.rvm.io | bash -s stable
+    \curl -sSL https://get.rvm.io | bash -s stable
     ;;
   weechat)
     replace_file 'weechat'

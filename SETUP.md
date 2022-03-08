@@ -7,7 +7,7 @@
 - [Workman Layout](http://workmanlayout.org)
   - Remove U.S. from `AppleEnabledInputSources` in `~/Library/Preferences/com.apple.HIToolbox.plist`, and then reboot
 
-  ``` plist
+  ``` xml
   <dict>
   	<key>InputSourceKind</key>
   	<string>Keyboard Layout</string>
@@ -20,7 +20,7 @@
 
   You may have ABC instead of U.S.
 
-  ``` plist
+  ``` xml
   <dict>
   	<key>InputSourceKind</key>
   	<string>Keyboard Layout</string>
@@ -82,50 +82,6 @@
     mv /Volumes/Macintosh\ HD/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs.orig
     ln -s /Volumes/Macintosh\ HD/usr/local/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs
     ```
-- [FUSE for macOS](https://osxfuse.github.io)
-    - Install FUSE for macOS package
-    - Install NTFS-3G by running `brew install homebrew/fuse/ntfs-3g`
-    - From OS X El Capitan, reboot in [recovery mode](https://support.apple.com/en-us/HT201314)
-        - Open Utilities > Terminal
-    - Run following commands:
-
-      ``` sh
-      sudo mv /Volumes/Macintosh\ HD/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs.orig
-      sudo ln -s /Volumes/Macintosh\ HD/usr/local/sbin/mount_ntfs /Volumes/Macintosh\ HD/sbin/mount_ntfs
-      ```
-
-## Fonts
-
-- [SF Mono](https://developer.apple.com/fonts/) (`/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-*`)
-
-## Applications
-
-- [1Password](https://agilebits.com/downloads)
-- [AppCleaner](http://freemacsoft.net/appcleaner/)
-    - Turn on SmartDelete
-- [Chrome](https://www.google.com/chrome/)
-- [Dropbox](https://www.dropbox.com/install)
-- [Fantastical](https://flexibits.com/fantastical)
-- [GPG Suite](https://gpgtools.org)
-    - Customize > Uncheck GPGMail
-- [HyperSwitch](https://bahoom.com/hyperswitch)
-    - App Switcher
-        - Check "When activating an app without windows, try to open the default window"
-- [MacTeX](https://www.tug.org/mactex/)
-- [Palua](https://itunes.apple.com/kr/app/palua/id431494195?mt=12)
-- [Safari Extensions](https://safari-extensions.apple.com)
-    - [1Password](https://safari-extensions.apple.com/details/?id=com.agilebits.onepassword4-safari-2BUA8C4S2C)
-    - [uBlock](https://www.ublock.org)
-- [The Unarchiver](https://itunes.apple.com/kr/app/the-unarchiver/id425424353?mt=12)
-- Quick Look
-    - [BetterZip Quick Look Generator](https://macitbetter.com/BetterZip-Quick-Look-Generator/)
-    - [Suspicious Package](http://www.mothersruin.com/software/SuspiciousPackage/)
-    - [QLColorCode](https://github.com/anthonygelibert/QLColorCode)
-    - [QLMarkdown](https://github.com/toland/qlmarkdown)
-    - [QLStephen](https://whomwah.github.io/qlstephen/)
-    - [QuickLookCSV](https://github.com/p2/quicklook-csv)
-    - [qlImageSize](https://github.com/Nyx0uf/qlImageSize)
-- [WinArchiver Lite](https://itunes.apple.com/kr/app/winarchiver-lite/id414855915?mt=12)
 
 ## Fonts
 
@@ -145,7 +101,7 @@
 - [Chrome](https://www.google.com/chrome/)
 - [Contexts](https://contexts.co)
   - Appearance
-    - Theme: Vibrant Dark
+    - Appearance: Match System
   - General
     - Check "When using multiple displays, use switching workaround
   - Sidebar
@@ -186,11 +142,12 @@
 - [Karabiner-Elements](https://karabiner-elements.pqrs.org)
   - Simple modifications
     - From key: caps_lock, To key: left_control
-- [Lunar](https://lunar.fyi)
+- [Lunar 3](https://lunar.fyi)
 - [MacTeX](https://www.tug.org/mactex/)
 - [Magnet](https://itunes.apple.com/kr/app//id441258766?mt=12)
 - [Mailplane](https://mailplaneapp.com)
-- [NightOwl](https://nightowl.kramser.xyz) (macOS 10.14 and above)
+- [MarkText](https://github.com/marktext/marktext)
+- [NightOwl](https://nightowl.kramser.xyz) (macOS 10.14)
 - [PDF Expert](https://pdfexpert.com)
 - [Safari Extensions](https://safari-extensions.apple.com)
   - macOS 10.15 and above
@@ -206,7 +163,6 @@
 - [UninstallPKG](https://www.corecode.io/uninstallpkg/)
 - Quick Look
   - [BetterZip Quick Look Generator](https://macitbetter.com/BetterZip-Quick-Look-Generator/)
-  - [Glance](https://github.com/samuelmeuli/glance) (macOS 10.15)
   - [QLColorCode](https://github.com/anthonygelibert/QLColorCode) (macOS 10.14 or below)
   - [qlImageSize](https://github.com/Nyx0uf/qlImageSize)
   - [QLMarkdown](https://github.com/toland/qlmarkdown)
@@ -273,16 +229,17 @@
 - [나눔글꼴](https://hangeul.naver.com/font) (나눔바른고딕, 나눔명조)
 - [D2 Coding](https://github.com/naver/d2codingfont)
 - [KoPubWorld 서체](http://www.kopus.org/Biz/electronic/Font.aspx)
-- [Noto CJK](https://www.google.com/get/noto/help/cjk/)
+- [Source Han Sans](https://github.com/adobe-fonts/source-han-sans)
+- [Source Han Serif](https://github.com/adobe-fonts/source-han-serif)
 
 ## Tools
 
 - [Git](https://git-scm.com)
   - [dotfiles](https://github.com/yous/dotfiles)
 - [gVim](https://github.com/vim/vim-win32-installer/releases)
-  - [Python 2.7.15](https://www.python.org/downloads/release/python-2715/)
-  - [Python 3.6.5](https://www.python.org/downloads/release/python-365/)
-  - [Ruby 2.4.4 (x86)](https://rubyinstaller.org/downloads/archives/)
+  - [Python 2.7](https://www.python.org/downloads/)
+  - [Python 3.10](https://www.python.org/downloads/)
+  - [Ruby 3.0 (x64)](https://rubyinstaller.org/downloads/archives/)
     - Add `bin` and `bin/ruby_builtin_dlls` to `%PATH%`
   - [Ctags](https://github.com/universal-ctags/ctags-win32)
     - Put into `%USERPROFILE%\bin`
@@ -317,6 +274,7 @@
 - [Java SE](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [TeX Live](https://www.tug.org/texlive/acquire-netinstall.html)
 - [Windows Subsystem for Linux](https://docs.microsoft.com/ko-kr/windows/wsl/install-win10)
+- [Windows Terminal](https://aka.ms/terminal)
 - Add `%USERPROFILE%\bin` to `%PATH%`
 
 ## Applications

@@ -1,6 +1,6 @@
 # dotfiles
 
-[![Build Status](https://github.com/yous/dotfiles/workflows/CI/badge.svg?branch=master)](https://github.com/yous/dotfiles/actions?query=branch%3Amaster)
+[![Build Status](https://github.com/0xdkay/dotfiles/workflows/CI/badge.svg?branch=master)](https://github.com/0xdkay/dotfiles/actions?query=branch%3Amaster)
 
 [@0xdkay](https://github.com/0xdkay)' dotfiles.
 

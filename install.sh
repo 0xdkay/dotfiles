@@ -145,8 +145,7 @@ case "$1" in
     fi
 
     # dotfiles update
-    git remote add downstream https://github.com/0xdkay/dotfiles.git 2</dev/null
-    git pull downstream master
+    git pull https://github.com/0xdkay/dotfiles.git master
 
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!

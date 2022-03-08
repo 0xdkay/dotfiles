@@ -177,7 +177,8 @@ case "$1" in
     echo "need to add below public key to github"
     cat "$HOME/.ssh/id_rsa.pub"
     echo -n "press enter when you done..."
-    read -r t
+    # shellcheck disable=SC2034 # just for waiting key press
+    read -r TMP
     ssh -T git@github.com
     ;;
 

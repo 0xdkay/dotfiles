@@ -98,10 +98,15 @@ fi
 
 # setup npm
 if command -v npm >/dev/null; then
-  if [ ! -e "$HOME/.npm-global" ]; then
-    mkdir "$HOME/.npm-global"
+  if [ ! -e "$HOME/.npm_global" ]; then
+    mkdir "$HOME/.npm_global"
   fi
-  add_to_path_once "$HOME/.npm-global/bin"
+  add_to_path_once "$HOME/.npm_global/bin"
+fi
+
+# setup n
+if command -v n >/dev/null; then
+  export N_PREFIX="$HOME/.npm_global"
 fi
 
 # Unset local functions and variables

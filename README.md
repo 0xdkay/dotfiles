@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/yous/dotfiles/workflows/CI/badge.svg?branch=master)](https://github.com/yous/dotfiles/actions?query=branch%3Amaster)
 
-[@yous](https://github.com/yous)' dotfiles.
+[@0xdkay](https://github.com/0xdkay)' dotfiles.
 
 ## Table of Contents
 
@@ -31,7 +31,7 @@
 Clone this repository:
 
 ``` sh
-git clone https://github.com/yous/dotfiles.git
+git clone https://github.com/0xdkay/dotfiles.git
 cd dotfiles
 ```
 
@@ -43,15 +43,18 @@ For available install options:
 
 | Command option | Description                              |
 |----------------|------------------------------------------|
+| `update`       | Update installed packages                |
+| `base`         | Install basic packages                   |
 | `link`         | Install symbolic links                   |
-| `brew`         | Install Homebrew on macOS (or Linux)     |
-| `chruby`       | Install chruby                           |
-| `formulae`     | Install Homebrew formulae using Brewfile |
 | `pwndbg`       | Install pwndbg                           |
+| `github`       | Install github account                   |
+| `brew`         | Install Homebrew on macOS (or Linux)     |
+| `formulae`     | Install Homebrew formulae using Brewfile |
 | `pyenv`        | Install pyenv with pyenv-virtualenv      |
-| `rbenv`        | Install rbenv                            |
-| `ruby-install` | Install ruby-install                     |
 | `rustup`       | Install rustup                           |
+| `ruby-install` | Install ruby-install                     |
+| `chruby`       | Install chruby                           |
+| `rbenv`        | Install rbenv                            |
 | `rvm`          | Install RVM                              |
 | `weechat`      | Install WeeChat configuration            |
 

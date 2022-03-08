@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 DIRNAME="$(dirname "$0")"
 DIR="$(cd "$DIRNAME" && pwd)"
@@ -15,7 +15,6 @@ usage() {
   echo '    update        Update installed packages'
   echo '    base          Install basic packages'
   echo '    link          Install symbolic links'
-  echo '    antibody      Install Antibody'
   echo '    pwndbg        Install pwndbg'
   echo '    github        Install github account'
   echo '    brew          Install Homebrew on macOS (or Linux)'
@@ -153,6 +152,11 @@ install_link() {
   echo 'Done.'
 }
 
+if [ "$#" -ne 1 ]; then
+  usage
+  exit 1
+fi
+
 case "$1" in
   update)
 
@@ -207,18 +211,6 @@ case "$1" in
     install_link
     ;;
 
-  ycm)
-    sudo apt-get install -y build-essential cmake
-    sudo apt-get install -y python-dev python3-dev
-
-    cd "$HOME/.vim/plugged/YouCompleteMe"
-    ./install.py --clang-completer
-    ;;
-
-  antibody)
-    curl -sL https://git.io/antibody | bash -s
-    ;;
-
   brew)
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     ;;
@@ -233,7 +225,7 @@ case "$1" in
     fi
     ;;
   formulae)
-    brew bundle --file="${DIR}/Brewfile" --no-lock
+    brew bundle --file="${DIR}/Brewfile" --no-lock --no-upgrade
     ;;
   pwndbg)
     init_submodules

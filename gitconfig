@@ -58,8 +58,6 @@
 	fetchJobs = 0
 [user]
 	useConfigOnly = true
-	email = 0xdkay@gmail.com
-	name = Dongkwan Kim
 [include]
 	path = ~/.gitconfig.user
 	path = ~/.gitconfig.local

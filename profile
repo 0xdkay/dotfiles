@@ -1,5 +1,13 @@
 UNAME="$(uname)"
 if [ "$UNAME" = 'Darwin' ]; then
+  # /usr/libexec/path_helper is problematic
+  # https://stackoverflow.com/a/48228223/3108885
+  # https://github.com/rbenv/rbenv/issues/369#issuecomment-36010083
+  if [ -f /etc/profile ]; then
+    PATH=""
+    source /etc/profile
+  fi
+
   export LANG=en_US.UTF-8
 fi
 
@@ -19,9 +27,16 @@ add_to_path_once() {
   esac
 }
 
-# Add /usr/local/bin to PATH for Mac OS X
+# Load Homebrew for macOS
 if [ "$UNAME" = 'Darwin' ]; then
-  add_to_path_once "/usr/local/bin:/usr/local/sbin"
+  # macOS Intel
+  if [ -e /usr/local/bin/brew ]; then
+    eval $(/usr/local/bin/brew shellenv)
+  fi
+  # Apple silicon
+  if [ -d /opt/homebrew ]; then
+    eval $(/opt/homebrew/bin/brew shellenv)
+  fi
 fi
 
 # Load Linuxbrew

@@ -7,7 +7,6 @@ if command -v keychain >/dev/null; then
     KEY='id_rsa'
   fi
   if [ -n "$KEY" ]; then
-    echo "Setting keychain"
     if [ "$(uname)" = 'Darwin' ]; then
       eval `keychain --eval --quiet --agents ssh --inherit any $KEY`
     else
@@ -219,21 +218,21 @@ FZF-EOF"
   }
 fi
 
-## Load chruby
-#if [ -e /usr/local/share/chruby/chruby.sh ]; then
-#  source /usr/local/share/chruby/chruby.sh
-#  source /usr/local/share/chruby/auto.sh
-#elif [ -n "$BREW_PREFIX" ]; then
-#  if [ -e "$BREW_PREFIX/opt/chruby/share/chruby/chruby.sh" ]; then
-#    source "$BREW_PREFIX/opt/chruby/share/chruby/chruby.sh"
-#    source "$BREW_PREFIX/opt/chruby/share/chruby/auto.sh"
-#  fi
-#fi
-#
-## Load rbenv
-#if command -v rbenv >/dev/null || [ -e "$HOME/.rbenv" ]; then
-#  eval "$(rbenv init - zsh)"
-#fi
+# Load chruby
+if [ -e /usr/local/share/chruby/chruby.sh ]; then
+  source /usr/local/share/chruby/chruby.sh
+  source /usr/local/share/chruby/auto.sh
+elif [ -n "$BREW_PREFIX" ]; then
+  if [ -e "$BREW_PREFIX/opt/chruby/share/chruby/chruby.sh" ]; then
+    source "$BREW_PREFIX/opt/chruby/share/chruby/chruby.sh"
+    source "$BREW_PREFIX/opt/chruby/share/chruby/auto.sh"
+  fi
+fi
+
+# Load rbenv
+if command -v rbenv >/dev/null || [ -e "$HOME/.rbenv" ]; then
+  eval "$(rbenv init - zsh)"
+fi
 
 # Load pyenv
 if command -v pyenv >/dev/null; then
@@ -248,28 +247,28 @@ elif [ -e "$HOME/.pyenv" ]; then
   fi
 fi
 
-## Load RVM into a shell session *as a function*
-#if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-#  source "$HOME/.rvm/scripts/rvm"
-#
-#  if [[ "$(type rvm | head -n 1)" == "rvm is a shell function" ]]; then
-#    # Add RVM to PATH for scripting
-#    case ":$PATH:" in
-#      *":$HOME/.rvm/bin:"*)
-#        ;;
-#      *)
-#        export PATH="$PATH:$HOME/.rvm/bin"
-#    esac
-#    export rvmsudo_secure_path=1
-#
-#    # Use right RVM gemset when using tmux
-#    if [ -n "$TMUX" ]; then
-#      rvm use default
-#      pushd -q ..
-#      popd -q
-#    fi
-#  fi
-#fi
+# Load RVM into a shell session *as a function*
+if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  source "$HOME/.rvm/scripts/rvm"
+
+  if [[ "$(type rvm | head -n 1)" == "rvm is a shell function" ]]; then
+    # Add RVM to PATH for scripting
+    case ":$PATH:" in
+      *":$HOME/.rvm/bin:"*)
+        ;;
+      *)
+        export PATH="$PATH:$HOME/.rvm/bin"
+    esac
+    export rvmsudo_secure_path=1
+
+    # Use right RVM gemset when using tmux
+    if [ -n "$TMUX" ]; then
+      rvm use default
+      pushd -q ..
+      popd -q
+    fi
+  fi
+fi
 
 # Unset local functions and variables
 unset BREW_PREFIX
@@ -283,17 +282,6 @@ fi
 if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
-export PATH=$HOME/.local/bin:$PATH
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-zinit light-mode for \
-    zdharma-continuum/zinit-annex-as-monitor \
-    zdharma-continuum/zinit-annex-bin-gem-node \
-    zdharma-continuum/zinit-annex-patch-dl \
-    zdharma-continuum/zinit-annex-rust
-
-### End of Zinit's installer chunk

@@ -16,6 +16,7 @@ usage() {
   echo '    base          Install basic packages'
   echo '    link          Install symbolic links'
   echo '    pwndbg        Install pwndbg'
+  echo '    gef           Install gef'
   echo '    github        Install github account'
   echo '    brew          Install Homebrew on macOS (or Linux)'
   echo '    formulae      Install Homebrew formulae using Brewfile'
@@ -230,6 +231,14 @@ case "$1" in
     init_submodules
     cd "${DIR}/pwndbg"
     ./setup.sh
+    ;;
+  gef)
+    init_submodules
+    cd "${DIR}/gef"
+    # Load gef into GDB on every launch.
+    if ! grep gef ~/.gdbinit &>/dev/null; then
+        echo "source $PWD/gef.py" >> ~/.gdbinit
+    fi
     ;;
   pyenv)
     if [ "$(uname)" = 'Darwin' ]; then

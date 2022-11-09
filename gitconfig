@@ -6,6 +6,7 @@
 	pager = less -F -R -X
 	precomposeUnicode = true
 	quotePath = false
+	filemode = false
 [color]
 	ui = auto
 [commit]
@@ -58,6 +59,8 @@
 	fetchJobs = 0
 [user]
 	useConfigOnly = true
+	name = Dongkwan Kim
+	email = 0xdkay@gmail.com
 [include]
 	path = ~/.gitconfig.user
 	path = ~/.gitconfig.local

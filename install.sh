@@ -195,11 +195,11 @@ case "$1" in
     # setup github
     echo "Type your github account: "
     read -r GITHUB_ACCOUNT
-    ssh-keygen -t rsa -C "$GITHUB_ACCOUNT"
+    ssh-keygen -t ed25519 -C "$GITHUB_ACCOUNT"
     eval "$(ssh-agent)"
-    ssh-add "$HOME/.ssh/id_rsa"
+    ssh-add "$HOME/.ssh/id_ed25519"
     echo "need to add below public key to github"
-    cat "$HOME/.ssh/id_rsa.pub"
+    cat "$HOME/.ssh/id_ed25519.pub"
     echo -n "press enter when you done..."
     # shellcheck disable=SC2034 # just for waiting key press
     read -r TMP

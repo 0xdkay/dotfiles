@@ -206,6 +206,22 @@ FZF-EOF"
   }
 fi
 
+# Load mise
+if command -v mise >/dev/null; then
+  eval "$(mise activate bash)"
+elif [ -e "$HOME/.local/bin/mise" ]; then
+  eval "$("$HOME/.local/bin/mise" activate bash)"
+fi
+
+# Load asdf
+if [ -n "$BREW_PREFIX" ]; then
+  if [ -e "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]; then
+    . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
+  fi
+elif [ -e "$HOME/.asdf/asdf.sh" ]; then
+  . "$HOME/.asdf/asdf.sh"
+fi
+
 # Load chruby
 if [ -e /usr/local/share/chruby/chruby.sh ]; then
   source /usr/local/share/chruby/chruby.sh

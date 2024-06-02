@@ -58,6 +58,9 @@ fi
 if command -v n >/dev/null; then
   export N_PREFIX="$HOME/.n"
   add_to_path_once "$N_PREFIX/bin"
+elif [ -e "$HOME/.n" ]; then
+  export N_PREFIX="$HOME/.n"
+  add_to_path_once "$N_PREFIX/bin"
 fi
 
 # Set GOPATH for Go
@@ -98,6 +101,12 @@ if [ -e /proc/version ] && grep -q Microsoft /proc/version; then
   export COLORTERM='truecolor'
 fi
 
+# WSL
+# See https://github.com/microsoft/WSL/issues/423
+if [ -e /proc/sys/kernel/osrelease ] && grep -q WSL /proc/sys/kernel/osrelease; then
+  export COLORTERM='truecolor'
+fi
+
 # Set VISUAL
 if command -v vim >/dev/null; then
   export VISUAL="$(command -v vim)"
@@ -105,6 +114,18 @@ fi
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
+  # Homebrew shell completion
+  if command -v brew >/dev/null; then
+    BREW_PREFIX="$(brew --prefix)"
+    if [ -e "$BREW_PREFIX/etc/profile.d/bash_completion.sh" ]; then
+      source "$BREW_PREFIX/etc/profile.d/bash_completion.sh"
+    else
+      for COMPLETION in "$BREW_PREFIX/etc/bash_completion.d/"*; do
+        [ -e "$COMPLETION" ] && source "$COMPLETION"
+      done
+    fi
+    unset BREW_PREFIX
+  fi
   # include .bashrc if it exists
   if [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"

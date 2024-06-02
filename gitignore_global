@@ -27,8 +27,10 @@ Session.vim
 node_modules/
 
 # Python
-*.pyc
+__pycache__/
+*.py[cod]
 .python-version
+venv/
 
 # Ruby
 .bundle/
@@ -63,3 +65,9 @@ ncscope.out*
 # ccls
 .ccls
 .ccls-cache/
+
+# clangd
+.cache/clangd/
+
+# mise
+.mise.toml

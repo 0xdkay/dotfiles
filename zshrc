@@ -56,6 +56,10 @@ if [ ! -e "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh" ]; th
 fi
 source "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 
+# Homebrew shell completion
+if [ -n "$BREW_PREFIX" ]; then
+  zinit fpath -f "$BREW_PREFIX/share/zsh/site-functions"
+fi
 # Additional completion definitions for Zsh
 if is-at-least 5.3; then
   zinit ice lucid wait'0' blockf
@@ -69,11 +73,16 @@ zinit light romkatv/powerlevel10k
 zinit light yous/vanilli.sh
 # Jump quickly to directories that you have visited "frecently." A native ZSH
 # port of z.sh.
+if is-at-least 5.3; then
+  zinit ice lucid wait'0' blockf
+else
+  zinit ice blockf
+fi
 zinit light agkozak/zsh-z
 # Syntax-highlighting for Zshell – fine granularity, number of features, 40 work
 # hours themes (short name F-Sy-H)
 if is-at-least 5.3; then
-  zinit ice lucid wait'0' atinit'zpcompinit; zpcdreplay'
+  zinit ice lucid wait'0' atinit'zicompinit; zicdreplay'
 else
   autoload -Uz compinit
   compinit
@@ -110,7 +119,7 @@ __prompt_precmd() {
 
   # Inside screen or tmux
   case "$TERM" in
-    screen*)
+    screen*|tmux*)
       # Set window title
       print -n '\e]0;'
       echo -n "$window_title"
@@ -150,7 +159,7 @@ __prompt_preexec() {
 
   # Inside screen or tmux
   case "$TERM" in
-    screen*)
+    screen*|tmux*)
       # Set window name
       print -n '\ek'
       echo -n "$tab_title"
@@ -216,6 +225,22 @@ if [ -f ~/.fzf.zsh ]; then
         {}
 FZF-EOF"
   }
+fi
+
+# Load mise
+if command -v mise >/dev/null; then
+  eval "$(mise activate zsh)"
+elif [ -e "$HOME/.local/bin/mise" ]; then
+  eval "$("$HOME/.local/bin/mise" activate zsh)"
+fi
+
+# Load asdf
+if [ -n "$BREW_PREFIX" ]; then
+  if [ -e "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]; then
+    . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
+  fi
+elif [ -e "$HOME/.asdf/asdf.sh" ]; then
+  . "$HOME/.asdf/asdf.sh"
 fi
 
 # Load chruby

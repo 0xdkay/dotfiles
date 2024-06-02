@@ -12,20 +12,22 @@ usage() {
   echo "usage: $(basename "$0") <command>"
   echo ''
   echo 'Available commands:'
-  echo '    update        Update installed packages'
-  echo '    base          Install basic packages'
-  echo '    link          Install symbolic links'
-  echo '    pwndbg        Install pwndbg'
-  echo '    github        Install github account'
-  echo '    brew          Install Homebrew on macOS (or Linux)'
-  echo '    formulae      Install Homebrew formulae using Brewfile'
-  echo '    pyenv         Install pyenv with pyenv-virtualenv'
-  echo '    rustup        Install rustup'
-  echo '    ruby-install  Install ruby-install'
-  echo '    chruby        Install chruby'
-  echo '    rbenv         Install rbenv'
-  echo '    rvm           Install RVM'
-  echo '    weechat       Install WeeChat configuration'
+  echo '    update       Update installed packages'
+  echo '    base         Install basic packages'
+  echo '    github       Install github account'
+  echo '    link         Install symbolic links'
+  echo '    asdf         Install asdf'
+  echo '    brew         Install Homebrew on macOS (or Linux)'
+  echo '    chruby       Install chruby'
+  echo '    formulae     Install Homebrew formulae using Brewfile'
+  echo '    mise         Install mise'
+  echo '    n            Install n'
+  echo '    pyenv        Install pyenv with pyenv-virtualenv'
+  echo '    rbenv        Install rbenv'
+  echo '    ruby-install Install ruby-install'
+  echo '    rustup       Install rustup'
+  echo '    rvm          Install RVM'
+  echo '    weechat      Install WeeChat configuration'
 }
 
 init_submodules() {
@@ -135,6 +137,14 @@ install_link() {
   do
     replace_file "$FILENAME"
   done
+  replace_file 'bat/config' '.config/bat/config'
+  replace_file 'gdb-dashboard/.gdbinit' '.gdbinit'
+  replace_file 'gdbinit.d'
+  if [ "$(uname)" = 'Darwin' ]; then
+    replace_file 'lazygit/config.yml' 'Library/Application Support/lazygit/config.yml'
+  else
+    replace_file 'lazygit/config.yml' '.config/lazygit/config.yml'
+  fi
   replace_file 'pip.conf' '.pip/pip.conf'
   replace_file 'tpm' '.tmux/plugins/tpm'
   [ ! -d "$HOME/.vim" ] && mkdir "$HOME/.vim"
@@ -209,15 +219,21 @@ case "$1" in
   link)
     install_link
     ;;
-
+  asdf)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install asdf
+    else
+      git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.13.1
+    fi
+    ;;
   brew)
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     ;;
   chruby)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install chruby
     else
-      wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+      wget https://github.com/postmodern/chruby/releases/download/v0.3.9/chruby-0.3.9.tar.gz
       tar -xzvf chruby-0.3.9.tar.gz
       cd chruby-0.3.9/
       sudo make install
@@ -226,17 +242,26 @@ case "$1" in
   formulae)
     brew bundle --file="${DIR}/Brewfile" --no-lock --no-upgrade
     ;;
-  pwndbg)
-    init_submodules
-    cd "${DIR}/pwndbg"
-    ./setup.sh
+  mise)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install mise
+    else
+      curl https://mise.run | sh
+    fi
+    ;;
+  n)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install n
+    else
+      curl -L https://bit.ly/n-install | N_PREFIX="$HOME/.n" bash -s -- -y
+    fi
     ;;
   pyenv)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install pyenv
       brew install pyenv-virtualenv
     else
-      curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+      curl https://pyenv.run | bash
     fi
     ;;
   rbenv)
@@ -246,15 +271,14 @@ case "$1" in
       git_clone https://github.com/rbenv/rbenv.git .rbenv
       git_clone https://github.com/rbenv/ruby-build.git .rbenv/plugins/ruby-build
     fi
-    echo 'Done.'
     ;;
   ruby-install)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install ruby-install
     else
-      wget -O ruby-install-0.7.0.tar.gz https://github.com/postmodern/ruby-install/archive/v0.7.0.tar.gz
-      tar -xzvf ruby-install-0.7.0.tar.gz
-      cd ruby-install-0.7.0/
+      wget https://github.com/postmodern/ruby-install/releases/download/v0.9.2/ruby-install-0.9.2.tar.gz
+      tar -xzvf ruby-install-0.9.2.tar.gz
+      cd ruby-install-0.9.2/
       sudo make install
     fi
     ;;

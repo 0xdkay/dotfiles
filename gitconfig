@@ -6,16 +6,24 @@
 	pager = less -F -R -X
 	precomposeUnicode = true
 	quotePath = false
+[alias]
+	find-merge = "!bash -c 'commit=$0 && branch=${1:-HEAD} && \
+		git rev-list $commit..\"$branch\" --ancestry-path | \
+		grep -f <(git rev-list $commit..\"$branch\" --first-parent) | \
+		tail -1'"
+	show-merge = "!sh -c 'merge=$(git find-merge \"$0\" \"$1\") && \
+		[ -n \"$merge\" ] && git show -m $merge'"
 [color]
 	ui = auto
 [commit]
 	verbose = true
 [diff]
+	algorithm = histogram
 	colorMoved = true
 	compactionHeuristic = true
 	renames = true
 	submodule = log
-	wsErrorHighlight = old,new
+	wsErrorHighlight = all
 [diff "utf-16"]
 	textconv = iconv -f utf-16 -t utf-8
 [difftool]
@@ -34,6 +42,8 @@
 	diffFilter = diff-highlight
 [log]
 	date = iso8601
+[merge]
+	conflictStyle = diff3
 [pager]
 	diff = diff-highlight | $(git config core.pager)
 	log = diff-highlight | $(git config core.pager)
@@ -56,6 +66,7 @@
 	showStash = true
 [submodule]
 	fetchJobs = 0
+	recurse = true
 [user]
 	useConfigOnly = true
 [include]

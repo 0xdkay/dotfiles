@@ -176,7 +176,7 @@ install_gpg() {
 
   # Generate a temporary configuration file for batch key generation
   GPG_CONFIG=$(mktemp)
-  cat <<EOF > $GPG_CONFIG
+  cat <<EOF > "$GPG_CONFIG"
   Key-Type: eddsa
   Key-Curve: ed25519
   Key-Usage: sign
@@ -186,10 +186,10 @@ install_gpg() {
 EOF
 
   # Generate the GPG key
-  gpg --batch --generate-key $GPG_CONFIG
+  gpg --batch --generate-key "$GPG_CONFIG"
 
   # Clean up the temporary configuration file
-  rm $GPG_CONFIG
+  rm "$GPG_CONFIG"
 
   # Extract the GPG key ID for the generated key
   KEY_ID=$(gpg --list-keys | grep -B 1 "<$NAME_EMAIL>" | head -n 1 | awk '{print $1}')
@@ -203,14 +203,14 @@ EOF
   # Output the GPG key ID and public key
   echo "GPG Key ID: $KEY_ID"
   echo "need to add below gpg public key to github"
-  gpg --armor --export $KEY_ID
+  gpg --armor --export "$KEY_ID"
   echo -n "press enter when you done..."
   # shellcheck disable=SC2034 # just for waiting key press
   read -r TMP
 
   git config -f ~/.gitconfig.local commit.gpgsign true
   git config -f ~/.gitconfig.local tag.gpgsign true
-  git config -f ~/.gitconfig.local user.signingkey $KEY_ID
+  git config -f ~/.gitconfig.local user.signingkey "$KEY_ID"
 }
 
 if [ "$#" -ne 1 ]; then

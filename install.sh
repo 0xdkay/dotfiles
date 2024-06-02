@@ -278,7 +278,7 @@ case "$1" in
     if [ "$(uname)" = 'Darwin' ]; then
       brew install asdf
     else
-      git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.13.1
+      git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
     fi
     ;;
   brew)

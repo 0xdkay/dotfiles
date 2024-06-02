@@ -1,12 +1,13 @@
 [commit]
-	gpgSign = false
+	gpgSign = true
 [sendemail]
 	smtpEncryption = tls
 	smtpServer = smtp.gmail.com
 	smtpServerPort = 587
 	smtpUser = 0xdkay@gmail.com
 [tag]
-	gpgSign = false
+	gpgSign = true
 [user]
 	name = Dongkwan Kim
 	email = 0xdkay@gmail.com
+        signingkey = 62B9C2C447E166FB94B740632988AB5C6A5B9F0A

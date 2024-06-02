@@ -15,6 +15,7 @@ usage() {
   echo '    update       Update installed packages'
   echo '    base         Install basic packages'
   echo '    github       Install github account'
+  echo '    github_gpg   Install github gpg for signing commits'
   echo '    link         Install symbolic links'
   echo '    asdf         Install asdf'
   echo '    brew         Install Homebrew on macOS (or Linux)'
@@ -161,6 +162,57 @@ install_link() {
   echo 'Done.'
 }
 
+install_gpg() {
+  # Retrieve the user.name and user.email from Git configuration
+  NAME_REAL=$(git config -f gitconfig.user user.name)
+  NAME_EMAIL=$(git config -f gitconfig.user user.email)
+
+  # Check if the values were retrieved successfully
+  if [ -z "$NAME_REAL" ] || [ -z "$NAME_EMAIL" ]; then
+    echo "Error: Could not retrieve user.name and user.email from Git configuration."
+    echo "Check them in \"gitconfig.user\" file."
+    exit 1
+  fi
+
+  # Generate a temporary configuration file for batch key generation
+  GPG_CONFIG=$(mktemp)
+  cat <<EOF > $GPG_CONFIG
+  Key-Type: eddsa
+  Key-Curve: ed25519
+  Key-Usage: sign
+  Expire-Date: 0
+  Name-Real: $NAME_REAL
+  Name-Email: $NAME_EMAIL
+EOF
+
+  # Generate the GPG key
+  #gpg --batch --generate-key $GPG_CONFIG
+
+  # Clean up the temporary configuration file
+  rm $GPG_CONFIG
+
+  # Extract the GPG key ID for the generated key
+  KEY_ID=$(gpg --list-keys | grep -B 1 "<$NAME_EMAIL>" | head -n 1 | awk '{print $1}')
+
+  # Check if the key ID was retrieved successfully
+  if [ -z "$KEY_ID" ]; then
+    echo "Error: Could not retrieve the GPG key ID."
+    exit 1
+  fi
+
+  # Output the GPG key ID and public key
+  echo "GPG Key ID: $KEY_ID"
+  echo "need to add below gpg public key to github"
+  gpg --armor --export $KEY_ID
+  echo -n "press enter when you done..."
+  # shellcheck disable=SC2034 # just for waiting key press
+  read -r TMP
+
+  git config -f ~/.gitconfig.local commit.gpgsign true
+  git config -f ~/.gitconfig.local tag.gpgsign true
+  git config -f ~/.gitconfig.local user.signingkey $KEY_ID
+}
+
 if [ "$#" -ne 1 ]; then
   usage
   exit 1
@@ -168,7 +220,6 @@ fi
 
 case "$1" in
   update)
-
     if [[ "$(uname)" != 'Darwin' ]]; then
       # update package list
       sudo apt-get update
@@ -214,6 +265,10 @@ case "$1" in
     # shellcheck disable=SC2034 # just for waiting key press
     read -r TMP
     ssh -T git@github.com
+    ;;
+
+  github_gpg)
+    install_gpg
     ;;
 
   link)

@@ -186,7 +186,7 @@ install_gpg() {
 EOF
 
   # Generate the GPG key
-  #gpg --batch --generate-key $GPG_CONFIG
+  gpg --batch --generate-key $GPG_CONFIG
 
   # Clean up the temporary configuration file
   rm $GPG_CONFIG

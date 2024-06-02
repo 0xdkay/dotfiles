@@ -326,3 +326,5 @@ LC_ALL=en_US.UTF-8
 
 # for history timestamp saving
 setopt EXTENDED_HISTORY
+
+export GPG_TTY=$(tty)

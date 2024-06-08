@@ -174,6 +174,8 @@ install_gpg() {
     exit 1
   fi
 
+  echo "Setting GPG for ${NAME_REAL} (${NAME_EMAIL})"
+
   # Generate a temporary configuration file for batch key generation
   GPG_CONFIG=$(mktemp)
   cat <<EOF > "$GPG_CONFIG"

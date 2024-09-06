@@ -23,6 +23,8 @@ usage() {
   echo '    formulae     Install Homebrew formulae using Brewfile'
   echo '    mise         Install mise'
   echo '    n            Install n'
+  echo '    pwndbg       Install pwndbg'
+  echo '    dashboard    Install gdb-dashboard'
   echo '    pyenv        Install pyenv with pyenv-virtualenv'
   echo '    rbenv        Install rbenv'
   echo '    ruby-install Install ruby-install'
@@ -139,8 +141,6 @@ install_link() {
     replace_file "$FILENAME"
   done
   replace_file 'bat/config' '.config/bat/config'
-  replace_file 'gdb-dashboard/.gdbinit' '.gdbinit'
-  replace_file 'gdbinit.d'
   if [ "$(uname)" = 'Darwin' ]; then
     replace_file 'lazygit/config.yml' 'Library/Application Support/lazygit/config.yml'
   else
@@ -234,6 +234,8 @@ case "$1" in
     # dotfiles update
     git pull https://github.com/0xdkay/dotfiles.git master
 
+    init_submodules
+
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
     ;;
@@ -312,6 +314,15 @@ case "$1" in
     else
       curl -L https://bit.ly/n-install | N_PREFIX="$HOME/.n" bash -s -- -y
     fi
+    ;;
+  pwndbg)
+    init_submodules
+    cd "${DIR}/pwndbg"
+    ./setup.sh
+    ;;
+  dashboard)
+    replace_file 'gdb-dashboard/.gdbinit' '.gdbinit'
+    replace_file 'gdbinit.d'
     ;;
   pyenv)
     if [ "$(uname)" = 'Darwin' ]; then

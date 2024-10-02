@@ -92,10 +92,14 @@ endfunction
 call s:DownloadVimPlug()
 call plug#begin(s:vimfiles . '/plugged')
 
+" -----------------------------------------------------------------------------
 " Colorscheme
+" -----------------------------------------------------------------------------
 Plug 'yous/vim-open-color'
 
+" -----------------------------------------------------------------------------
 " General
+" -----------------------------------------------------------------------------
 if !exists('+fixendofline')
   " Preserve missing EOL at the end of text files
   Plug 'yous/PreserveNoEOL', {
@@ -124,6 +128,8 @@ endif
 Plug 'will133/vim-dirdiff'
 " Vim: file and hunk folding support for diff/patch files.
 Plug 'sgeb/vim-diff-fold'
+" A Vim plugin to copy text through SSH with OSC52
+Plug 'ojroques/vim-oscyank'
 " A Vim plugin that manages your tag files
 if executable('ctags') || executable('cscope')
   if v:version >= 800
@@ -140,7 +146,9 @@ Plug 'tpope/vim-fugitive'
 " Plug 'tpope/vim-fugitive' |
 Plug 'junegunn/gv.vim'
 
+" -----------------------------------------------------------------------------
 " Browsing
+" -----------------------------------------------------------------------------
 if !has('win32') && (!has('win32unix') || executable('go'))
   " A command-line fuzzy finder written in Go
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -159,12 +167,17 @@ endif
 " Go to Terminal or File manager
 Plug 'justinmk/vim-gtfo'
 
+" -----------------------------------------------------------------------------
 " Completion and lint
+" -----------------------------------------------------------------------------
 " Intellisense engine for Vim8 & Neovim, full language server protocol support
 " as VSCode
-if (has('nvim-0.3.2') || !has('nvim') && has('patch-8.0.1453')) &&
-      \ executable('node')
-  Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+if executable('node')
+  if has('nvim-0.4.0') || !has('nvim') && has('patch-8.1.1719')
+    Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+  elseif has('nvim-0.3.2') || !has('nvim') && has('patch-8.0.1453')
+    Plug 'neoclide/coc.nvim', { 'tag': 'v0.0.81' }
+  endif
 endif
 " Print documents in echo area
 if exists('v:completed_item') && exists('v:event')
@@ -179,7 +192,9 @@ else
   Plug 'vim-syntastic/syntastic'
 endif
 
+" -----------------------------------------------------------------------------
 " Motions and text changing
+" -----------------------------------------------------------------------------
 " Autocomplete if end
 Plug 'tpope/vim-endwise'
 " Lightning fast left-right movement in Vim
@@ -211,7 +226,9 @@ Plug 'vim-scripts/a.vim'
 " Enable repeating supported plugin maps with "."
 Plug 'tpope/vim-repeat'
 
+" -----------------------------------------------------------------------------
 " Vim UI
+" -----------------------------------------------------------------------------
 " A light and configurable statusline/tabline for Vim
 Plug 'itchyny/lightline.vim'
 " Highlight the exact differences, based on characters and words
@@ -240,12 +257,16 @@ elseif has('signs')
   " Show a git diff in the gutter and stages/reverts hunks
   Plug 'airblade/vim-gitgutter'
 endif
+" zoomwintab vim plugin
+Plug 'troydm/zoomwintab.vim', { 'on': 'ZoomWinTabToggle' }
 " Distraction-free writing in Vim
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 " color hex codes and color names
 Plug 'chrisbra/Colorizer'
 
+" -----------------------------------------------------------------------------
 " Support file types
+" -----------------------------------------------------------------------------
 " AdBlock
 Plug 'yous/adblock-filter.vim', { 'for': 'adblockfilter' }
 " Aheui
@@ -256,7 +277,7 @@ Plug 'Shirk/vim-gas', { 'for': 'gas' }
 Plug 'lervag/vimtex', { 'for': ['bib', 'tex'] }
 " Markdown
 Plug 'godlygeek/tabular', { 'for': 'markdown' } |
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'preservim/vim-markdown', { 'for': 'markdown' }
 " PHP
 Plug 'vim-scripts/php.vim-html-enhanced', { 'for': ['html', 'php'] }
 if v:version >= 700
@@ -267,6 +288,8 @@ endif
 Plug 'tpope/vim-rake'
 " RBS
 Plug 'pocke/rbs.vim'
+" reStructuredText
+Plug 'habamax/vim-rst', { 'for': 'rst' }
 " RuboCop
 Plug 'ngmy/vim-rubocop', { 'on': 'RuboCop' }
 " smali
@@ -277,11 +300,13 @@ Plug 'raichoo/smt-vim', { 'for': 'smt' }
 Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " A solid language pack for Vim
 let g:polyglot_disabled = [
-      \ 'latex', 'markdown',
+      \ 'latex', 'markdown', 'rst',
       \ 'autoindent', 'sensible']
 Plug 'sheerun/vim-polyglot'
 
+" -----------------------------------------------------------------------------
 " macOS
+" -----------------------------------------------------------------------------
 if has('mac') || has('macunix')
   " Add plist editing support to Vim
   Plug 'darfink/vim-plist'
@@ -310,6 +335,8 @@ endif
 set autoread
 set background=dark
 set backspace=indent,eol,start
+" Don't make a backup before overwriting a file
+set nobackup
 " Use the clipboard register '*'
 set clipboard=unnamed
 if has('unnamedplus')
@@ -333,6 +360,11 @@ if has('multi_byte')
   set fileencodings=ucs-bom,utf-8,cp949,latin1
 endif
 set fileformats=unix,mac,dos
+if exists('+fixendofline')
+  " When writing a file and this option is on, <EOL> at the end of file will be
+  " restored if missing
+  set nofixendofline
+endif
 if has('folding')
   " Sets 'foldlevel' when starting to edit another buffer in a window
   set foldlevelstart=99
@@ -345,15 +377,6 @@ if has('extra_search')
   " Show where the pattern while typing a search command
   set incsearch
 endif
-" Don't make a backup before overwriting a file
-set nobackup
-if exists('+fixendofline')
-  " When writing a file and this option is on, <EOL> at the end of file will be
-  " restored if missing
-  set nofixendofline
-endif
-" Override the 'ignorecase' if the search pattern contains upper case
-set smartcase
 " Don't redraw the screen while executing macros, registers and other commands
 " that have not been typed
 set lazyredraw
@@ -383,9 +406,15 @@ set shortmess+=c
 if has('patch-8.1.1270')
   set shortmess-=S
 endif
+" Override the 'ignorecase' if the search pattern contains upper case
+set smartcase
+set spellcapcheck=
 " Exclude East Asian characters from spell checking
 set spelllang-=cjk
 set spelllang+=cjk
+if exists('+spelloptions')
+  set spelloptions+=camel
+endif
 " Files with these suffixes get a lower priority when multiple files match a
 " wildcard
 set suffixes+=.git,.hg,.svn
@@ -400,6 +429,14 @@ if has('path_extra')
   set tags-=./tags;
   set tags^=./tags;
 endif
+if !isdirectory(s:vimfiles . '/undo')
+  call mkdir(s:vimfiles . '/undo', 'p')
+endif
+" List of directory names for undo files, separated with commas
+execute 'set undodir^=' . s:vimfiles . '/undo//'
+" Automatically saves undo history to an undo file when writing a buffer to a
+" file, and restores undo history from the same file on buffer read
+set undofile
 " Maximum number of changes that can be undone
 set undolevels=1000
 if !has_key(g:plugs, 'FixCursorHold.nvim')
@@ -462,9 +499,9 @@ if has('extra_search')
 endif
 " Always show a status line
 set laststatus=2
-set number
 " Don't consider octal number when using the CTRL-A and CTRL-X commands
 set nrformats-=octal
+set number
 set scrolloff=3
 if has('cmdline_info')
   " Show command in the last line of the screen
@@ -475,6 +512,10 @@ set showmatch
 " The minimal number of columns to scroll horizontally
 set sidescroll=1
 set sidescrolloff=10
+if exists('+smoothscroll')
+  " Scrolling works with screen lines
+  set smoothscroll
+endif
 if has('windows')
   set splitbelow
 endif
@@ -526,6 +567,17 @@ augroup ExtraWhitespace
   endif
 augroup END
 
+function! s:UnderlineSpellBad()
+  highlight clear SpellBad
+  highlight SpellBad cterm=underline gui=underline
+endfunction
+call s:UnderlineSpellBad()
+augroup UnderlineSpellBad
+  autocmd!
+  autocmd ColorScheme * call s:UnderlineSpellBad()
+  autocmd Syntax * syntax spell toplevel
+augroup END
+
 " }}}
 " =============================================================================
 " GUI: {{{
@@ -534,7 +586,9 @@ augroup END
 if has('gui_running')
   set guifont=Consolas:h10:cANSI
   set guioptions+=! " External commands are executed in a terminal window
+  set guioptions-=e " Tab pages
   set guioptions-=m " Menu bar
+  set guioptions-=t " Tearoff menu items
   set guioptions-=T " Toolbar
   set guioptions-=r " Right-hand scrollbar
   set guioptions-=L " Left-hand scrollbar when window is vertically split
@@ -659,13 +713,13 @@ endif
 set expandtab
 " Insert only one space after a '.', '?' and '!' with a join command
 set nojoinspaces
-" Number of spaces that a <Tab> counts for while editing
-" Use the value of 'shiftwidth'
-set softtabstop=-1
 " Number of spaces to use for each step of (auto)indent
 set shiftwidth=2
 " <Tab> in front of a line inserts blanks according to 'shiftwidth'
 set smarttab
+" Number of spaces that a <Tab> counts for while editing
+" Use the value of 'shiftwidth'
+set softtabstop=-1
 " Number of spaces that a <Tab> in the file counts for
 set tabstop=8
 " Maximum width of text that is being inserted
@@ -682,7 +736,9 @@ augroup TextFormatting
   " Reload .editorconfig because of heuristic detections done by vim-polyglot
   autocmd FileType c,cpp,perl
         \ setlocal shiftwidth=4 |
-        \ :EditorConfigReload
+        \ if has_key(g:plugs, 'editorconfig-vim') |
+        \   execute 'EditorConfigReload' |
+        \ endif
 
   autocmd FileType go
         \ setlocal noexpandtab shiftwidth=4 tabstop=4
@@ -777,8 +833,15 @@ endfunction
 inoremap <expr> {<CR> <SID>CloseBrace()
 
 " Navigate completions
-inoremap <expr> <Tab> pumvisible() ? "\<C-N>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
+if has_key(g:plugs, 'coc.nvim')
+  inoremap <expr> <Tab> coc#pum#visible() ? coc#pum#next(1) :
+        \ pumvisible() ? "\<C-N>" : "\<Tab>"
+  inoremap <expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) :
+        \ pumvisible() ? "\<C-P>" : "\<S-Tab>"
+else
+  inoremap <expr> <Tab> pumvisible() ? "\<C-N>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
+endif
 
 " Leave insert mode
 function! s:CtrlL()
@@ -793,6 +856,10 @@ inoremap <silent> <C-L> <C-O>:call <SID>CtrlL()<CR>
 
 " Delete without copying
 vnoremap <BS> "_d
+nnoremap c "_c
+vnoremap c "_c
+nnoremap cc "_cc
+nnoremap C "_C
 
 " Break the undo block when CTRL-U
 inoremap <C-U> <C-G>u<C-U>
@@ -896,23 +963,6 @@ endif
 
 " Execute @q which is recorded by qq
 nnoremap Q @q
-
-" Zoom and restore window
-function! s:ZoomToggle()
-  if exists('t:zoom_winrestcmd')
-    execute t:zoom_winrestcmd
-    if t:zoom_winrestcmd !=# winrestcmd()
-      wincmd =
-    endif
-    unlet t:zoom_winrestcmd
-  elseif tabpagewinnr(tabpagenr(), '$') > 1
-    " Resize only when multiple windows are in the current tab page
-    let t:zoom_winrestcmd = winrestcmd()
-    resize
-    vertical resize
-  endif
-endfunction
-nnoremap <silent> <Leader>z :<C-U>call <SID>ZoomToggle()<CR>
 
 " Cscope mappings
 if has('cscope') && executable('cscope')
@@ -1249,6 +1299,9 @@ endif
 " FixCursorHold.nvim
 let g:cursorhold_updatetime = 100
 
+" vim-oscyank
+vmap <Leader>y <Plug>OSCYankVisual
+
 " vim-gutentags
 function! s:BuildTagsFileListCmd(prog)
   let filetypes = [
@@ -1299,48 +1352,83 @@ let g:gutentags_file_list_command = {
       \   : s:BuildTagsFileListCmd('find') }
 let g:gutentags_cscope_build_inverted_index = 1
 
+" vim-fugitive
+function! s:FugitiveOpenBrowser()
+  let hash = matchstr(getline('.'), '^\^\=[?*]*\zs\x\+')
+  if hash =~# '^0\+$'
+    return
+  endif
+  let remote_url = FugitiveRemoteUrl()
+  if remote_url =~# '^git@'
+    let remote_url = substitute(remote_url, '^git@\(.*\):\(.*\)$', 'http://\1/\2', '')
+  endif
+  let remote_url = substitute(remote_url, '\.git$', '', '')
+  if remote_url =~# '^https\=://github\.com'
+    let commit_url = remote_url . '/commit/' . hash
+  elseif remote_url =~# '^https\=://bitbucket\.org'
+    let commit_url = remote_url . '/commits/' . hash
+  else
+    let commit_url = remote_url . '/-/commit/' . hash
+  endif
+  if has('win32')
+    let open_cmd = 'start "" "%s"'
+  elseif has('mac') || has('macnuix')
+    let open_cmd = 'open "%s"'
+  elseif executable('xdg-open')
+    let open_cmd = 'xdg-open "%s"'
+  elseif executable('gio')
+    let open_cmd = 'gio open "%s"'
+  else
+    return
+  endif
+  call system(printf(open_cmd, commit_url))
+endfunction
+augroup FugitiveBrowser
+  autocmd!
+  autocmd FileType fugitiveblame
+        \ nnoremap <buffer> <silent> <Leader>o :<C-U>call <SID>FugitiveOpenBrowser()<CR>
+augroup END
+
 " fzf.vim
 if has_key(g:plugs, 'fzf.vim')
-  nnoremap <C-P> :Files<CR>
-  nnoremap g<C-P> :GFiles<CR>
-  nnoremap c<C-P> :History :<CR>
+  function! s:GetVisualSelection()
+    let [line_start, column_start] = getpos("'<")[1:2]
+    let [line_end, column_end] = getpos("'>")[1:2]
+    let lines = getline(line_start, line_end)
+    if len(lines) == 0
+      return ''
+    endif
+    let offset = &selection ==# 'exclusive' ? 2 : 1
+    let lines[-1] = lines[-1][:column_end - offset]
+    let lines[0] = lines[0][column_start - 1:]
+    return join(lines, "\n")
+  endfunction
+  nnoremap <C-P> :<C-U>Files<CR>
+  nnoremap g<C-P> :<C-U>GFiles<CR>
+  nnoremap c<C-P> :<C-U>History :<CR>
+  nnoremap <Leader><C-]> :<C-U>Tags<Space><C-R><C-W><CR>
+  vnoremap <Leader><C-]> :<C-U>Tags<Space><C-R>=<SID>GetVisualSelection()<CR><CR>
   if executable('rg')
-    function! s:GetVisualSelection()
-      let [line_start, column_start] = getpos("'<")[1:2]
-      let [line_end, column_end] = getpos("'>")[1:2]
-      let lines = getline(line_start, line_end)
-      if len(lines) == 0
-        return ''
-      endif
-      let offset = &selection ==# 'exclusive' ? 2 : 1
-      let lines[-1] = lines[-1][:column_end - offset]
-      let lines[0] = lines[0][column_start - 1:]
-      return join(lines, "\n")
-    endfunction
     let s:rg_common = 'rg --column --line-number --no-heading --color=always ' .
           \ '--smart-case '
     command! -bang -nargs=* Rg
           \ call fzf#vim#grep(
           \   s:rg_common . '--fixed-strings -- ' . shellescape(<q-args>),
           \   1,
-          \   fzf#vim#with_preview(
-          \     { 'options': '--delimiter : --nth 4..' }, 'right', 'ctrl-/'),
+          \   fzf#vim#with_preview(),
           \   <bang>0)
     command! -bang -nargs=+ -complete=dir Rgd
           \ call fzf#vim#grep(
           \   s:rg_common . '--fixed-strings -- ' . shellescape(''),
           \   1,
           \   fzf#vim#with_preview(
-          \     { 'dir': fnamemodify(expand(<q-args>), ':p:h'),
-          \       'options': '--delimiter : --nth 4..' },
-          \     'right', 'ctrl-/'),
+          \     { 'dir': fnamemodify(expand(<q-args>), ':p:h') }),
           \   <bang>0)
     command! -bang -nargs=* Rgr
           \ call fzf#vim#grep(
           \   s:rg_common . '-- ' . shellescape(<q-args>),
           \   1,
-          \   fzf#vim#with_preview({ 'options': '--delimiter : --nth 4..' },
-          \     'right', 'ctrl-/'),
+          \   fzf#vim#with_preview(),
           \   <bang>0)
     nnoremap <Leader>* :<C-U>Rg<Space><C-R><C-W><CR>
     vnoremap <Leader>* :<C-U>Rg<Space><C-R>=<SID>GetVisualSelection()<CR><CR>
@@ -1361,23 +1449,19 @@ if has_key(g:plugs, 'fzf.vim')
 endif
 
 " vim-dirvish
-function! s:ResetDirvishCursor()
-  let curline = getline('.')
-  keepjumps call search('\V\^' . escape(curline, '\') . '\$', 'cw')
-endfunction
 augroup DirvishConfig
   autocmd!
   autocmd FileType dirvish silent! unmap <buffer> <C-N>
   autocmd FileType dirvish silent! unmap <buffer> <C-P>
-  autocmd FileType dirvish call <SID>ResetDirvishCursor()
 augroup END
+
+" vim-dirvish-git
+let g:dirvish_git_show_icons = 0
 
 " coc.nvim
 if has_key(g:plugs, 'coc.nvim')
+  call coc#config('suggest.noselect', v:true)
   call coc#config('suggest.minTriggerInputLength', 4)
-  if has_key(g:plugs, 'echodoc.vim')
-    call coc#config('suggest.echodocSupport', v:true)
-  endif
   if has_key(g:plugs, 'ale')
     call coc#config('diagnostic.displayByAle', v:true)
   endif
@@ -1388,11 +1472,15 @@ if has_key(g:plugs, 'coc.nvim')
   if executable('clangd')
     call coc#add_extension('coc-clangd')
   else
-    let s:llvm_clangd_path = '/usr/local/opt/llvm/bin/clangd'
-    if executable(s:llvm_clangd_path)
-      call coc#config('clangd.path', s:llvm_clangd_path)
-      call coc#add_extension('coc-clangd')
-    endif
+    for s:llvm_clangd_path in [
+          \ '/opt/homebrew/opt/llvm/bin/clangd',
+          \ '/usr/local/opt/llvm/bin/clangd']
+      if executable(s:llvm_clangd_path)
+        call coc#config('clangd.path', s:llvm_clangd_path)
+        call coc#add_extension('coc-clangd')
+        break
+      endif
+    endfor
   endif
 
   " coc-pyright
@@ -1414,6 +1502,21 @@ if has_key(g:plugs, 'coc.nvim')
     call coc#config('python.pythonPath', exepath('python3'))
   elseif has('python')
     call coc#config('python.pythonPath', exepath('python'))
+  endif
+  call coc#config('inlayHint.enable', v:false)
+
+  " coc-rust-analyzer
+  if executable('rust-analyzer')
+    call coc#config('rust-analyzer.server.path', exepath('rust-analyzer'))
+    call coc#add_extension('coc-rust-analyzer')
+  endif
+
+  " coc-solargraph
+  call coc#config('solargraph.promptDownload', v:false)
+  if executable('solargraph')
+    call coc#config('solargraph.shell', $SHELL)
+    call coc#config('solargraph.diagnostics', v:true)
+    call coc#add_extension('coc-solargraph')
   endif
 
   " coc-rust-analyzer
@@ -1443,6 +1546,24 @@ if has_key(g:plugs, 'coc.nvim')
           \ let b:coc_enabled = 0
   augroup END
 
+  " GoTo code navigation
+  nmap <silent> gd <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gi <Plug>(coc-implementation)
+  nmap <silent> gr <Plug>(coc-references)
+
+  function! s:ShowDocumentation()
+    if CocAction('hasProvider', 'hover')
+      call CocActionAsync('doHover')
+    else
+      call feedkeys('K', 'in')
+    endif
+  endfunction
+
+  " Use K to show documentation in preview window
+  nnoremap <silent> K :call <SID>ShowDocumentation()<CR>
+
+  " Add `:Format` command to format current buffer
   command! -nargs=0 Format :call CocAction('format')
 endif
 
@@ -1468,6 +1589,7 @@ if has_key(g:plugs, 'ale')
     let g:ale_linters_ignore['rust'] = ['cargo']
   endif
   let g:ale_set_highlights = 0
+  let g:ale_virtualtext_cursor = 'disabled'
 
   " ale-c-options, ale-cpp-options
   let g:ale_c_parse_compile_commands = 1
@@ -1479,12 +1601,17 @@ if has_key(g:plugs, 'ale')
         \ ['clang-check', 'clangcheck', ['cpp']],
         \ ['clang-format', 'clangformat', ['c']],
         \ ['clang-tidy', 'clangtidy', ['c', 'cpp']]]
-    let s:llvm_prog = '/usr/local/opt/llvm/bin/' . s:prog
-    if !executable(s:prog) && executable(s:llvm_prog)
-      for s:lang in s:langs
-        let g:[printf('ale_%s_%s_executable', s:lang, s:slug)] = s:llvm_prog
-      endfor
-    endif
+    for s:llvm_path in [
+          \ '/opt/homebrew/opt/llvm',
+          \ '/usr/local/opt/llvm']
+      let s:llvm_prog = s:llvm_path . '/bin/' . s:prog
+      if !executable(s:prog) && executable(s:llvm_prog)
+        for s:lang in s:langs
+          let g:[printf('ale_%s_%s_executable', s:lang, s:slug)] = s:llvm_prog
+        endfor
+        break
+      endif
+    endfor
   endfor
 
   " See http://clang.llvm.org/extra/clang-tidy/.
@@ -1560,6 +1687,10 @@ let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
 " vim-wordmotion
 let g:wordmotion_prefix = '<Leader>'
+let g:wordmotion_mappings = {
+      \ '<C-R><C-W>': '<C-R><Leader><C-W>',
+      \ '<C-R><C-A>': '<C-R><Leader><C-A>'
+      \ }
 
 " bullets.vim
 let g:bullets_enabled_file_types = [
@@ -1607,14 +1738,15 @@ let g:lightline = {
       \   'right': [
       \     [has_key(g:plugs, 'ale') ? 'ale' : 'syntastic', 'lineinfo'],
       \     ['percent'],
-      \     ['fugitive', 'filetype', 'fileencoding', 'fileformat']] },
+      \     ['zoom', 'fugitive', 'filetype', 'fileencoding', 'fileformat']] },
       \ 'tabline': { 'left': [['tabs']], 'right': [[]] },
       \ 'tab': {
       \   'active': ['tabname', 'tabmodified'],
       \   'inactive': ['tabname', 'tabmodified'] },
       \ 'component': {
       \   'filename': '%<%{LightLineFilename()}' },
-      \ 'component_function': {},
+      \ 'component_function': {
+      \   'zoom': 'LightLineZoomWinTab' },
       \ 'tab_component_function': {},
       \ 'component_expand': {
       \   'readonly': 'LightLineReadonly',
@@ -1695,6 +1827,10 @@ function! LightLineFilename()
         \   (index(['" Press ? for help', '.. (up a dir)'], getline('.')) < 0 ?
         \     matchstr(getline('.'), '[0-9A-Za-z_/].*') : '') :
         \ '' !=# fname ? fnamemodify(fpath, ':~:.') : '[No Name]'
+endfunction
+
+function! LightLineZoomWinTab()
+  return exists('t:zoomwintab') ? 'Zoomed' : ''
 endfunction
 
 function! LightLineReadonly()
@@ -1878,7 +2014,43 @@ if has_key(g:plugs, 'vim-gitgutter')
   nnoremap <silent> ]c :<C-U>execute 'normal ' . v:count1 . "\<Plug>(GitGutterNextHunk)"<CR>zz
 endif
 
+" zoomwintab.vim
+let g:zoomwintab_remap = 0
+let g:zoomwintab_hidetabbar = 0
+nnoremap <silent> <Leader>z :execute ':silent ZoomWinTabToggle'<CR>
+if has('terminal')
+  tnoremap <silent> <C-W>o <C-W>:execute ':silent ZoomWinTabToggle'<CR>
+  tnoremap <silent> <C-W><C-O> <C-W>:execute ':silent ZoomWinTabToggle'<CR>
+endif
+
 " goyo.vim
+let g:goyo_width = 100
+" Ensure `:q` to quit even when Goyo is active
+" https://github.com/junegunn/goyo.vim/wiki/Customization#ensure-q-to-quit-even-when-goyo-is-active
+function! s:GoyoEnter()
+  let b:quitting = 0
+  let b:quitting_bang = 0
+  augroup GoyoQuitPre
+    autocmd!
+    autocmd QuitPre <buffer> let b:quitting = 1
+  augroup END
+  cabbrev <buffer> q! let b:quitting_bang = 1 <bar> q!
+endfunction
+function! s:GoyoLeave()
+  " Quit Vim if this is the only remaining buffer
+  if b:quitting && len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1
+    if b:quitting_bang
+      qa!
+    else
+      qa
+    endif
+  endif
+endfunction
+augroup GoyoCallbacks
+  autocmd!
+  autocmd User GoyoEnter call <SID>GoyoEnter()
+  autocmd User GoyoLeave call <SID>GoyoLeave()
+augroup END
 nnoremap <Leader>G :Goyo<CR>
 
 " Colorizer
@@ -1928,7 +2100,6 @@ let g:vimtex_syntax_minted = [
 " vim-markdown
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_emphasis_multiline = 0
-let g:vim_markdown_conceal = 0
 let g:vim_markdown_conceal_code_blocks = 0
 let g:vim_markdown_fenced_languages = [
       \ 'bat=dosbatch', 'batch=dosbatch',
@@ -1940,7 +2111,7 @@ let g:vim_markdown_fenced_languages = [
       \ 'ini=dosini',
       \ 'js=javascript',
       \ 'rb=ruby',
-      \ 'bash=sh',
+      \ 'bash=sh', 'shell=sh',
       \ 'viml=vim']
 let g:vim_markdown_frontmatter = 1
 let g:vim_markdown_new_list_item_indent = 0
@@ -1959,6 +2130,18 @@ augroup END
 " vim-rake
 nnoremap <Leader>ra :Rake<CR>
 
+" vim-rst
+let g:rst_syntax_code_list = {
+      \ 'c': ['c'],
+      \ 'cpp': ['cpp', 'c++'],
+      \ 'java': ['java'],
+      \ 'lisp': ['lisp'],
+      \ 'perl': ['perl'],
+      \ 'php': ['php'],
+      \ 'python': ['python'],
+      \ 'sh': ['sh'],
+      \ 'vim': ['vim'] }
+
 " vim-rubocop
 let g:vimrubocop_extra_args = '--display-cop-names'
 let g:vimrubocop_keymap = 0
@@ -1967,19 +2150,21 @@ nnoremap <Leader>ru :RuboCop<CR>
 " vim-polyglot
 " vim-javascript
 let g:javascript_plugin_jsdoc = 1
+" vim-svelte-plugin
+let g:vim_svelte_plugin_use_typescript = 1
 
 " macOS
 if has('mac') || has('macunix')
   " vim-plist
   function! s:ConvertBinaryPlist()
     silent! execute '%d'
-    call plist#Read(1)
-    call plist#ReadPost()
+    call plist#BufReadCmd()
     set fileencoding=utf-8
 
     augroup BinaryPlistWrite
       autocmd! BufWriteCmd,FileWriteCmd <buffer>
-      autocmd BufWriteCmd,FileWriteCmd <buffer> call plist#Write()
+      autocmd BufWriteCmd <buffer> call plist#BufWriteCmd()
+      autocmd FileWriteCmd <buffer> call plist#FileWriteCmd()
     augroup END
   endfunction
   augroup BinaryPlistRead

@@ -1,9 +1,12 @@
-[submodule "pwndbg"]
-	path = pwndbg
-	url = https://github.com/pwndbg/pwndbg.git
 [submodule "gef"]
 	path = gef
 	url = https://github.com/hugsy/gef
+[submodule "gdb-dashboard"]
+	path = gdb-dashboard
+	url = https://github.com/cyrus-and/gdb-dashboard.git
 [submodule "tpm"]
 	path = tpm
 	url = https://github.com/tmux-plugins/tpm.git
+[submodule "pwndbg"]
+	path = pwndbg
+	url = https://github.com/pwndbg/pwndbg.git

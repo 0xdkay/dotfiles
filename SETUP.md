@@ -139,11 +139,16 @@
 - [GnuPG for OSX](https://sourceforge.net/p/gpgosx/docu/Download/)
 - [Itsycal](https://www.mowglii.com/itsycal/)
 - [iTerm2](https://www.iterm2.com)
+  - Preferences > Keys > Key Bindings
+    - Set action of ^Tab↦ to Next Tab
+    - Set action of ^⇧Tab↤ to Previous Tab
+    - Add action of ⌘r to Ignore
 - [Karabiner-Elements](https://karabiner-elements.pqrs.org)
   - Simple modifications
     - From key: caps_lock, To key: left_control
 - [Lunar 3](https://lunar.fyi)
 - [MacTeX](https://www.tug.org/mactex/)
+- [Maccy](https://github.com/p0deje/Maccy)
 - [Magnet](https://itunes.apple.com/kr/app//id441258766?mt=12)
 - [Mailplane](https://mailplaneapp.com)
 - [MarkText](https://github.com/marktext/marktext)
@@ -165,7 +170,7 @@
   - [BetterZip Quick Look Generator](https://macitbetter.com/BetterZip-Quick-Look-Generator/)
   - [QLColorCode](https://github.com/anthonygelibert/QLColorCode) (macOS 10.14 or below)
   - [qlImageSize](https://github.com/Nyx0uf/qlImageSize)
-  - [QLMarkdown](https://github.com/toland/qlmarkdown)
+  - [QLMarkdown](https://github.com/sbarex/QLMarkdown)
   - [QLStephen](https://github.com/whomwah/qlstephen)
   - [QuickLookCSV](https://github.com/p2/quicklook-csv)
   - [SourceCodeSyntaxHighlight](https://github.com/sbarex/SourceCodeSyntaxHighlight) (macOS 10.15 or above)
@@ -271,7 +276,6 @@
     @echo off
     start /b putty -load Loco
     ```
-- [Java SE](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [TeX Live](https://www.tug.org/texlive/acquire-netinstall.html)
 - [Windows Subsystem for Linux](https://docs.microsoft.com/ko-kr/windows/wsl/install-win10)
 - [Windows Terminal](https://aka.ms/terminal)
@@ -281,10 +285,9 @@
 
 - [팟플레이어](https://tv.kakao.com/guide/potplayer)
 - [1Password](https://agilebits.com/downloads)
-- [Auto Dark Mode](https://github.com/Armin2208/Windows-Auto-Night-Mode)
+- [Auto Dark Mode](https://github.com/AutoDarkMode/Windows-Auto-Night-Mode)
   - Time
-    - Enable automatic theme switching: Check
-      - Select "From sunset to sunrise"
+    - Select "From sunset to sunrise"
   - Apps
     - Apps: Adapt to system
     - System: Adapt to system
@@ -297,8 +300,10 @@
   - 사용자 지정...
     - 밀도: 조밀함
   - `about:config`
+    - `alerts.useSystemBackend`: true
     - `mousewheel.with_control.action`: 1
     - `network.security.esni.enabled`: true
     - `network.trr.mode`: 2
+- [MarkText](https://github.com/marktext/marktext)
 - [ShareX](https://getsharex.com)
 - [Slack](https://slack.com)

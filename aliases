@@ -75,7 +75,7 @@ fi
 
 # Enable color support
 if ls --color -d . >/dev/null 2>&1; then
-  alias ls='ls --color=auto'
+  alias ls='ls --color'
 else
   alias ls='ls -G'
 fi
@@ -153,9 +153,10 @@ alias grb='git rebase'
 alias grba='git rebase --abort'
 alias grbc='git rebase --continue'
 alias grbi='git rebase --interactive'
-alias grr='git remote remove'
 alias grs='git reset'
+alias grsh='git reset --hard'
 alias grsp='git reset --patch'
+alias grsu='git reset --hard "@{upstream}"'
 alias grup='git remote update'
 alias grt='git restore'
 alias grtp='git restore --patch'
@@ -188,5 +189,5 @@ fi
 
 # Zinit
 if [ -n "$ZSH_VERSION" ]; then
-  alias ziup='zinit self-update && zinit update --all'
+  alias ziup='zinit self-update && zinit update --all --no-pager && zinit cclear'
 fi

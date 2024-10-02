@@ -12,21 +12,29 @@ usage() {
   echo "usage: $(basename "$0") <command>"
   echo ''
   echo 'Available commands:'
-  echo '    update        Update installed packages'
-  echo '    base          Install basic packages'
-  echo '    link          Install symbolic links'
-  echo '    pwndbg        Install pwndbg'
-  echo '    gef           Install gef'
-  echo '    github        Install github account'
-  echo '    brew          Install Homebrew on macOS (or Linux)'
-  echo '    formulae      Install Homebrew formulae using Brewfile'
-  echo '    pyenv         Install pyenv with pyenv-virtualenv'
-  echo '    rustup        Install rustup'
-  echo '    ruby-install  Install ruby-install'
-  echo '    chruby        Install chruby'
-  echo '    rbenv         Install rbenv'
-  echo '    rvm           Install RVM'
-  echo '    weechat       Install WeeChat configuration'
+  echo '    update       Update installed packages'
+  echo '    base         Install basic packages'
+  echo '    link         Install symbolic links'
+  echo '    asdf         Install asdf'
+  echo '    brew         Install Homebrew on macOS (or Linux)'
+  echo '=========================================='
+  echo '    github       Install github account'
+  echo '    github_gpg   Install github gpg for signing commits'
+  echo '=========================================='
+  echo '    pwndbg       Install pwndbg'
+  echo '    gef          Install gef'
+  echo '    dashboard    Install gdb-dashboard'
+  echo '=========================================='
+  echo '    pyenv        Install pyenv with pyenv-virtualenv'
+  echo '    rustup       Install rustup'
+  echo '    chruby       Install chruby'
+  echo '    formulae     Install Homebrew formulae using Brewfile'
+  echo '    mise         Install mise'
+  echo '    n            Install n'
+  echo '    rbenv        Install rbenv'
+  echo '    ruby-install Install ruby-install'
+  echo '    rvm          Install RVM'
+  echo '    weechat      Install WeeChat configuration'
 }
 
 init_submodules() {
@@ -136,6 +144,12 @@ install_link() {
   do
     replace_file "$FILENAME"
   done
+  replace_file 'bat/config' '.config/bat/config'
+  if [ "$(uname)" = 'Darwin' ]; then
+    replace_file 'lazygit/config.yml' 'Library/Application Support/lazygit/config.yml'
+  else
+    replace_file 'lazygit/config.yml' '.config/lazygit/config.yml'
+  fi
   replace_file 'pip.conf' '.pip/pip.conf'
   replace_file 'tpm' '.tmux/plugins/tpm'
   [ ! -d "$HOME/.vim" ] && mkdir "$HOME/.vim"
@@ -152,6 +166,59 @@ install_link() {
   echo 'Done.'
 }
 
+install_gpg() {
+  # Retrieve the user.name and user.email from Git configuration
+  NAME_REAL=$(git config -f gitconfig.user user.name)
+  NAME_EMAIL=$(git config -f gitconfig.user user.email)
+
+  # Check if the values were retrieved successfully
+  if [ -z "$NAME_REAL" ] || [ -z "$NAME_EMAIL" ]; then
+    echo "Error: Could not retrieve user.name and user.email from Git configuration."
+    echo "Check them in \"gitconfig.user\" file."
+    exit 1
+  fi
+
+  echo "Setting GPG for ${NAME_REAL} (${NAME_EMAIL})"
+
+  # Generate a temporary configuration file for batch key generation
+  GPG_CONFIG=$(mktemp)
+  cat <<EOF > "$GPG_CONFIG"
+  Key-Type: eddsa
+  Key-Curve: ed25519
+  Key-Usage: sign
+  Expire-Date: 0
+  Name-Real: $NAME_REAL
+  Name-Email: $NAME_EMAIL
+EOF
+
+  # Generate the GPG key
+  gpg --batch --generate-key "$GPG_CONFIG"
+
+  # Clean up the temporary configuration file
+  rm "$GPG_CONFIG"
+
+  # Extract the GPG key ID for the generated key
+  KEY_ID=$(gpg --list-keys | grep -B 1 "<$NAME_EMAIL>" | head -n 1 | awk '{print $1}')
+
+  # Check if the key ID was retrieved successfully
+  if [ -z "$KEY_ID" ]; then
+    echo "Error: Could not retrieve the GPG key ID."
+    exit 1
+  fi
+
+  # Output the GPG key ID and public key
+  echo "GPG Key ID: $KEY_ID"
+  echo "need to add below gpg public key to github"
+  gpg --armor --export "$KEY_ID"
+  echo -n "press enter when you done..."
+  # shellcheck disable=SC2034 # just for waiting key press
+  read -r TMP
+
+  git config -f ~/.gitconfig.local commit.gpgsign true
+  git config -f ~/.gitconfig.local tag.gpgsign true
+  git config -f ~/.gitconfig.local user.signingkey "$KEY_ID"
+}
+
 if [ "$#" -ne 1 ]; then
   usage
   exit 1
@@ -159,7 +226,6 @@ fi
 
 case "$1" in
   update)
-
     if [[ "$(uname)" != 'Darwin' ]]; then
       # update package list
       sudo apt-get update
@@ -171,6 +237,8 @@ case "$1" in
 
     # dotfiles update
     git pull https://github.com/0xdkay/dotfiles.git master
+
+    init_submodules
 
     # vim update
     vim +PlugUpgrade +PlugClean\! +PlugUpdate +qall\!
@@ -196,29 +264,39 @@ case "$1" in
     # setup github
     echo "Type your github account: "
     read -r GITHUB_ACCOUNT
-    ssh-keygen -t rsa -C "$GITHUB_ACCOUNT"
+    ssh-keygen -t ed25519 -C "$GITHUB_ACCOUNT"
     eval "$(ssh-agent)"
-    ssh-add "$HOME/.ssh/id_rsa"
+    ssh-add "$HOME/.ssh/id_ed25519"
     echo "need to add below public key to github"
-    cat "$HOME/.ssh/id_rsa.pub"
+    cat "$HOME/.ssh/id_ed25519.pub"
     echo -n "press enter when you done..."
     # shellcheck disable=SC2034 # just for waiting key press
     read -r TMP
     ssh -T git@github.com
     ;;
 
+  github_gpg)
+    install_gpg
+    ;;
+
   link)
     install_link
     ;;
-
+  asdf)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install asdf
+    else
+      git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+    fi
+    ;;
   brew)
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     ;;
   chruby)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install chruby
     else
-      wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+      wget https://github.com/postmodern/chruby/releases/download/v0.3.9/chruby-0.3.9.tar.gz
       tar -xzvf chruby-0.3.9.tar.gz
       cd chruby-0.3.9/
       sudo make install
@@ -226,6 +304,20 @@ case "$1" in
     ;;
   formulae)
     brew bundle --file="${DIR}/Brewfile" --no-lock --no-upgrade
+    ;;
+  mise)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install mise
+    else
+      curl https://mise.run | sh
+    fi
+    ;;
+  n)
+    if [ "$(uname)" = 'Darwin' ]; then
+      brew install n
+    else
+      curl -L https://bit.ly/n-install | N_PREFIX="$HOME/.n" bash -s -- -y
+    fi
     ;;
   pwndbg)
     init_submodules
@@ -240,12 +332,16 @@ case "$1" in
         echo "source $PWD/gef.py" >> ~/.gdbinit
     fi
     ;;
+  dashboard)
+    replace_file 'gdb-dashboard/.gdbinit' '.gdbinit'
+    replace_file 'gdbinit.d'
+    ;;
   pyenv)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install pyenv
       brew install pyenv-virtualenv
     else
-      curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+      curl https://pyenv.run | bash
     fi
     ;;
   rbenv)
@@ -255,15 +351,14 @@ case "$1" in
       git_clone https://github.com/rbenv/rbenv.git .rbenv
       git_clone https://github.com/rbenv/ruby-build.git .rbenv/plugins/ruby-build
     fi
-    echo 'Done.'
     ;;
   ruby-install)
     if [ "$(uname)" = 'Darwin' ]; then
       brew install ruby-install
     else
-      wget -O ruby-install-0.7.0.tar.gz https://github.com/postmodern/ruby-install/archive/v0.7.0.tar.gz
-      tar -xzvf ruby-install-0.7.0.tar.gz
-      cd ruby-install-0.7.0/
+      wget https://github.com/postmodern/ruby-install/releases/download/v0.9.2/ruby-install-0.9.2.tar.gz
+      tar -xzvf ruby-install-0.9.2.tar.gz
+      cd ruby-install-0.9.2/
       sudo make install
     fi
     ;;

@@ -173,10 +173,12 @@ Plug 'justinmk/vim-gtfo'
 " Intellisense engine for Vim8 & Neovim, full language server protocol support
 " as VSCode
 if executable('node')
-  if has('nvim-0.4.0') || !has('nvim') && has('patch-8.1.1719')
+  if has('nvim-0.8.0') || !has('nvim') && has('patch-9.0.0438')
     Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+  elseif has('nvim-0.4.0') || !has('nvim') && has('patch-8.1.1719')
+    Plug 'neoclide/coc.nvim', { 'commit': 'f0ce9ae' } " v0.0.82
   elseif has('nvim-0.3.2') || !has('nvim') && has('patch-8.0.1453')
-    Plug 'neoclide/coc.nvim', { 'tag': 'v0.0.81' }
+    Plug 'neoclide/coc.nvim', { 'commit': 'be514c7' } " v0.0.81
   endif
 endif
 " Print documents in echo area
@@ -907,11 +909,11 @@ function! s:VSearch(cmd)
   call setreg('"', old_reg, old_regtype)
 endfunction
 if has_key(g:plugs, 'vim-searchindex')
-  vnoremap * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>zz<Plug>SearchIndex
-  vnoremap # :<C-U>call <SID>VSearch('?')<CR>?<C-R>/<CR>zz<Plug>SearchIndex
+  vnoremap <silent> * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>zz<Plug>SearchIndex
+  vnoremap <silent> # :<C-U>call <SID>VSearch('?')<CR>?<C-R>/<CR>zz<Plug>SearchIndex
 else
-  vnoremap * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>zz
-  vnoremap # :<C-U>call <SID>VSearch('?')<CR>?<C-R>/<CR>zz
+  vnoremap <silent> * :<C-U>call <SID>VSearch('/')<CR>/<C-R>/<CR>zz
+  vnoremap <silent> # :<C-U>call <SID>VSearch('?')<CR>?<C-R>/<CR>zz
 endif
 
 " Center display after searching
@@ -953,8 +955,8 @@ else
       endif
     endif
   endfunction
-  nnoremap n :<C-U>call <SID>CenterBeforeSearch(0)<CR>n
-  nnoremap N :<C-U>call <SID>CenterBeforeSearch(1)<CR>N
+  nnoremap <silent> n :<C-U>call <SID>CenterBeforeSearch(0)<CR>n
+  nnoremap <silent> N :<C-U>call <SID>CenterBeforeSearch(1)<CR>N
   nnoremap * *zz
   nnoremap # #zz
   nnoremap g* g*zz
@@ -1465,7 +1467,6 @@ if has_key(g:plugs, 'coc.nvim')
   if has_key(g:plugs, 'ale')
     call coc#config('diagnostic.displayByAle', v:true)
   endif
-  call coc#config('coc.preferences.semanticTokensHighlights', v:false)
   call coc#config('coc.preferences.bracketEnterImprove', v:false)
 
   " coc-clangd
@@ -1515,19 +1516,6 @@ if has_key(g:plugs, 'coc.nvim')
   call coc#config('solargraph.promptDownload', v:false)
   if executable('solargraph')
     call coc#config('solargraph.shell', $SHELL)
-    call coc#config('solargraph.diagnostics', v:true)
-    call coc#add_extension('coc-solargraph')
-  endif
-
-  " coc-rust-analyzer
-  if executable('rust-analyzer')
-    call coc#config('rust-analyzer.server.path', exepath('rust-analyzer'))
-    call coc#add_extension('coc-rust-analyzer')
-  endif
-
-  " coc-solargraph
-  call coc#config('solargraph.promptDownload', v:false)
-  if executable('solargraph')
     call coc#config('solargraph.diagnostics', v:true)
     call coc#add_extension('coc-solargraph')
   endif
@@ -1585,6 +1573,9 @@ if has_key(g:plugs, 'ale')
         \   'mypy',
         \   'pylint',
         \   'pyright'] }
+  if executable('standardrb')
+    let g:ale_linters_ignore['ruby'] = ['rubocop']
+  endif
   if executable('rust-analyzer')
     let g:ale_linters_ignore['rust'] = ['cargo']
   endif

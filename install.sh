@@ -159,7 +159,8 @@ install_link() {
     'diff-highlight' \
     'diff-hunk-list' \
     'pyg' \
-    'server'
+    'server' \
+    'ssh-forward'
   do
     replace_file "bin/$FILENAME" "bin/$FILENAME"
   done

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -n "$TMUX" ]; then
+    # tmux show-environment에서 SSH_AUTH_SOCK 가져오기
+    new_sock=$(tmux show-environment SSH_AUTH_SOCK 2>/dev/null | cut -d= -f2)
+
+    if [ -n "$new_sock" ]; then
+        export SSH_AUTH_SOCK="$new_sock"
+        echo "✅ SSH_AUTH_SOCK updated: $SSH_AUTH_SOCK"
+    else
+        echo "❌ SSH_AUTH_SOCK not found in tmux environment."
+    fi
+else
+    echo "❌ Not inside tmux. This script should be run inside a tmux session."
+fi
+
